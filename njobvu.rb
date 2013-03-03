@@ -2,6 +2,9 @@ require 'sinatra'
 require 'json'
 require 'mail'
 
+# Ensure we see logs
+$stdout.sync = true
+
 post '/mail' do
   mail = Mail.new(params[:message])
   # do something with mail
