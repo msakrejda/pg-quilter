@@ -15,4 +15,4 @@ use Rack::CommonLogger
 
 require './web/api'
 
-map("/")            { run Njobvu::Root }
+map("/")            { run PGQuilter::Root }
