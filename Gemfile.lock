@@ -2,13 +2,36 @@ GEM
   remote: http://rubygems.org/
   specs:
     coderay (1.0.9)
+    faraday (0.8.7)
+      multipart-post (~> 1.1)
+    github_api (0.9.7)
+      faraday (~> 0.8.1)
+      hashie (>= 1.2)
+      multi_json (~> 1.4)
+      nokogiri (~> 1.5.2)
+      oauth2
+    hashie (2.0.3)
+    httpauth (0.2.0)
     i18n (0.6.4)
+    jwt (0.1.8)
+      multi_json (>= 1.5)
     mail (2.5.3)
       i18n (>= 0.4.0)
       mime-types (~> 1.16)
       treetop (~> 1.4.8)
     method_source (0.8.1)
     mime-types (1.22)
+    multi_json (1.7.2)
+    multi_xml (0.5.3)
+    multipart-post (1.2.0)
+    nokogiri (1.5.9)
+    oauth2 (0.9.1)
+      faraday (~> 0.8)
+      httpauth (~> 0.1)
+      jwt (~> 0.1.4)
+      multi_json (~> 1.0)
+      multi_xml (~> 0.5)
+      rack (~> 1.2)
     polyglot (0.3.3)
     pry (0.9.12)
       coderay (~> 1.0.5)
@@ -32,6 +55,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  github_api
   mail
   pry
   sequel
