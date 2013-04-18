@@ -7,6 +7,8 @@ require 'github_api'
 
 $:.unshift File.dirname(__FILE__)
 
+DB = Sequel.connect(ENV['DATABASE_URL'])
+
 require 'pgquilter/config'
 require 'pgquilter/application'
 require 'pgquilter/git'
