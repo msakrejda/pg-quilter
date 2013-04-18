@@ -1,11 +1,9 @@
 $stdout.sync = $stderr.sync = true
 
-require 'rubygems'
-require 'sinatra/base'
+require './lib/pgquilter'
 
 use Rack::CommonLogger
 
-require './lib/pgquilter'
 require './web/receiver'
 
 map("/")            { run PGQuilter::Receiver }
