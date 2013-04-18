@@ -43,7 +43,7 @@ module PgQuilter
 
     private
     def run_cmd(cmd)
-      stdout, stderr
+      # stdout, stderr
     end
 
     def git(cmd)
@@ -59,9 +59,9 @@ module PgQuilter
     end
 
     def prepare_workspace
-        ssh_setup
-        git_setup
-        git_clone
+      ssh_setup
+      git_setup
+      git_clone
     end
 
     def ssh_setup
