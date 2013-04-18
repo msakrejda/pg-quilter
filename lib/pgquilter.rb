@@ -5,6 +5,8 @@ require 'json'
 require 'mail'
 require 'github_api'
 
+$:.unshift File.dirname(__FILE__)
+
 require 'pgquilter/config'
 require 'pgquilter/application'
 require 'pgquilter/git'
