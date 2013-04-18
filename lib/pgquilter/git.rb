@@ -1,5 +1,3 @@
-require 'github_api'
-
 module PgQuilter
   class Git
 
