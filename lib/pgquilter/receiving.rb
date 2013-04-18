@@ -3,8 +3,7 @@ module PgQuilter
     def self.process(mail)
       puts "You've got mail!"
         
-      puts "From: #{mail.envelope.from}"
-      puts "Or maybe from: #{mail.from.addresses.join}"
+      puts "From: #{mail.from.addresses.join}"
       puts "Or maybe: #{mail.sender.address}"
       puts "Sent to: #{mail.to}"
       puts "CC: #{mail.cc}"
