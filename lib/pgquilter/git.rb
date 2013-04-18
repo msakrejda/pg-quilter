@@ -83,7 +83,7 @@ module PgQuilter
     def apply_patch(patch)
       patch_name = "#{patchset.topic.name}-#{patchset.message_id}-#{patch.patchset_order}.patch"
       patch_path = "/tmp/#{patch_name}"
-      File.open (patch_path, 'w') do |patch_file|
+      File.open(patch_path, 'w') do |patch_file|
         patch_file.write patch.body
       end
       result = git "apply #{patch_path}"
