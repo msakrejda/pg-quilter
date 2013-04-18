@@ -1,14 +1,7 @@
 module PgQuilter
   class Receiving
-    class FormatError < StandardError; end
-
     def self.process(mail)
-      unless mail.multipart?
-        raise FormatError, "Expected multipart mail"
-      end
-
       puts "You've got mail!"
-
         
       puts "From: #{mail.envelope.from}"
       puts "Or maybe from: #{mail.from.addresses.join}"
