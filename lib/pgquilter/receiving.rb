@@ -8,7 +8,7 @@ module PgQuilter
       puts "Sent to: #{mail.to}"
       puts "CC: #{mail.cc}"
       puts "Subject: #{mail.subject}"
-      Puts "Sent: #{mail.date.to_s}"
+      puts "Sent: #{mail.date.to_s}"
 
       mail.attachments.each do |attachment|
         puts "File name: #{attachment.filename}"
