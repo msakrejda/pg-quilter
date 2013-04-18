@@ -1,9 +1,11 @@
-require 'sinatra'
-require 'sinatra/base'
-
 require 'json'
 require 'mail'
 require 'github_api'
+
+require 'sequel'
+
+require 'sinatra'
+require 'sinatra/base'
 
 $:.unshift File.dirname(__FILE__)
 
