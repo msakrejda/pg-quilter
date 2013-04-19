@@ -1,19 +1,23 @@
 module PgQuilter
   class Receiving
-    def self.process(mail)
+    def self.process(message)
       puts "You've got mail!"
-        
-      puts "From: #{mail.from}"
-      puts "Or maybe: #{mail.sender.address unless mail.sender.nil?}"
-      puts "Sent to: #{mail.to}"
-      puts "CC: #{mail.cc}"
-      puts "Subject: #{mail.subject}"
-      puts "Sent: #{mail.date.to_s}"
+      return unless message.has_key? 'attachments'
 
-      mail.attachments.each do |attachment|
-        puts "File name: #{attachment.filename}"
-        puts "Content type: #{attachment.content_type}"
-        puts "Body: #{attachment.body.decoded[0-250]}"
+      headers = message['headers']
+
+      puts "From: #{headers['From']}"
+      puts "Date: #{headers['Date']}"
+      puts "Subject: #{headers['Subject']}"
+
+      message['attachments'].each do |k, attachment|
+        puts attachment.class
+        puts attachment
+        puts attachment[:type]
+
+        content = attachment[:tempfile].read
+
+        puts content
       end
       # 1. Check if any relevant attachments (attachments are going to
       #    be: text/x-diff, text/x-patch, application/x-gzip, ?)
@@ -22,11 +26,6 @@ module PgQuilter
       # 4. Create Patch for each attachment (unzip first if necessary)
       # 5. Schedule topic build
       # do something with mail
-      puts "Got an e-mail!"
-      puts "Sender: #{mail.sender}"
-      puts "Subject: #{mail.subject}"
-      puts "Date: #{mail.date.to_s}"
-      puts "Body: #{mail.body.decoded}"
     end
   end
 end
