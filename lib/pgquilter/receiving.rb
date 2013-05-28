@@ -14,6 +14,7 @@ module PgQuilter
     end
 
     def process(message)
+      puts "Processing message"
       message['attachments'].each do |k, attachment|
         puts attachment.class
         puts attachment
@@ -36,8 +37,8 @@ module PgQuilter
     end
 
     def is_to_hackers?(message)
-      to = message['headers']['To']
-      to && to.include?(PGQuilter::Config::PGSQL_HACKERS)
+      list = message['headers']['X-Mailing-List']
+      list == PGQuilter::Config::PGSQL_HACKERS
     end
 
     def includes_patches?(message)
