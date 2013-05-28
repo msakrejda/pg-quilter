@@ -3,14 +3,15 @@ Sequel.migration do
     create_table :topics do
       uuid :uuid, default: 'uuid_generate_v4()'.lit, primary_key: true
       text :name, null: false
-      text :pull_request, null: false
+      text :pull_request
       timestamptz :created_at, null: false, default: 'now()'.lit
-      text :committed_in
+      boolean :active, null: false, default: true
     end
 
-    create_table :patchsests do
+    create_table :patchsets do
       uuid :uuid, default: 'uuid_generate_v4()'.lit, primary_key: true
       foreign_key :topic_id, :topics
+      text :author, null: false
       text :message_id, null: false
       timestamptz :created_at, null: false, default: 'now()'.lit
     end
@@ -19,6 +20,7 @@ Sequel.migration do
       uuid :uuid, default: 'uuid_generate_v4()'.lit, primary_key: true
       foreign_key :patchset_id, :patchsets
       integer :patchset_order
+      text :filename, null: false
       text :body, null: false
     end
 

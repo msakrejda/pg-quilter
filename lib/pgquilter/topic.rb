@@ -2,12 +2,13 @@ require 'sequel'
 
 module PGQuilter
   class Topic < Sequel::Model
+    one_to_many :patchsets
 
     SUBJECT_WAS_RE = /.*\(\s*was:?\s*([^)]+)\s*\)/
 
     def self.for_subject(subject)
-      # normalize the subject, and find or create the Topic object to
-      # which this subject corresponds
+      normalized_subject = self.normalize(subject)
+      Topic.find_or_create(name: normalized_subject)
     end
 
     def self.normalize(subject)
@@ -19,5 +20,6 @@ module PGQuilter
       end
       subject.gsub!('[HACKERS]\s*', '').gsub!(/\W/, '-')
     end
+
   end
 end

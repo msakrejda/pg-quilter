@@ -6,6 +6,8 @@ module PgQuilter
     PATCH_TYPES = %w(text/x-diff, text/x-patch)
 
     def handle(message)
+      return unless message
+
       puts "You've got mail!"
       log message
       if of_interest? message
@@ -15,21 +17,22 @@ module PgQuilter
 
     def process(message)
       puts "Processing message"
-      message['attachments'].each do |k, attachment|
-        puts attachment.class
-        puts attachment
-        puts attachment[:type]
 
+      subject = message['headers']['Subject']
+      topic = Topic.for_subject(subject)
+
+      author =  message['headers']['From']
+      message_id = message['headers']['Message-ID'].gsub!(/^<|>$/,'')
+      patchset = topic.add_patchset(author: author, message_id: message_id)
+
+      message['attachments'].sort.select do |k, attachment|
+        PATCH_TYPES.include? attachment[:type]
+      end.each do |k, attachment|
+        filename = attachment[:filename]
         content = attachment[:tempfile].read
 
-        puts content
+        patchset.add_patch(patchset_order: k.to_i, filename: filename, body: content)
       end
-      # 1. Check if any relevant attachments
-      # 2. Find (or create) topic
-      # 3. Create Patchset
-      # 4. Create Patch for each attachment (unzip first if necessary)
-      # 5. Schedule topic build
-      # do something with mail
     end
 
     def of_interest?(message)
@@ -43,7 +46,7 @@ module PgQuilter
 
     def includes_patches?(message)
       message.has_key?('attachments') &&
-        !(PATCH_TYPES & message.attachments.map { |a| a[:type] }).empty?
+        !(PATCH_TYPES & message['attachments'].map { |a| a[:type] }).empty?
     end
 
     def log(message)
