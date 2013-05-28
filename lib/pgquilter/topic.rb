@@ -18,7 +18,7 @@ module PGQuilter
       if subject =~ SUBJECT_WAS_RE
         normalize subject.sub(SUBJECT_WAS_RE, '\1')
       end
-      subject.gsub!('[HACKERS]\s*', '').gsub!(/\W/, '-')
+      subject.gsub('[HACKERS]\s*', '').gsub(/\W/, '-')
     end
 
   end
