@@ -12,13 +12,10 @@ module PGQuilter
     end
 
     def self.normalize(subject)
-      # 1. Look for '(was $subject) and normalize subject instead
-      # 2. Strip '[HACKERS]'
-      # 3. Replace \W with '-'
       if subject =~ SUBJECT_WAS_RE
         normalize subject.sub(SUBJECT_WAS_RE, '\1')
       end
-      subject.gsub('[HACKERS]\s*', '').gsub(/\W/, '-')
+      subject.gsub(/(?:Re:|\[HACKERS\])\s*/, '').gsub(/\W/, '-')
     end
 
   end
