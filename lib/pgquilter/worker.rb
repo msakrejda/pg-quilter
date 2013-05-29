@@ -5,12 +5,10 @@ module PGQuilter
 
     def run
       prepare_workspace
-
-      FileUtils.cd(WORKSPACE_DIR) do
-        if apply_patchset
-          push_to_github
-          submit_pull_request
-        end
+      if apply_patchset
+        submit_pull_request
+        push_to_github
+        # if no pull request exists, create one
       end
     end
 

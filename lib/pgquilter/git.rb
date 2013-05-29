@@ -15,16 +15,16 @@ module PgQuilter
       # without actually losing commit history
       git "reset --hard master"
       patchset.patches.sort_by(&:patchset_order).each do |patch|
-        apply_patch("#{patch_path}", patch)
+        apply_patch(patch)
       end
-      git "commit . m 'Applying patch set for #{patchset.topic.name}'"
+      git "commit . --author='#{author}' -m 'Applying patch set for #{patchset.topic.name}'"
     end
 
     def push_to_github(patchset)
       # push both master and the patch so we always have the latest PR
-      run_cmd "git push origin master"
-      run_cmd "git cherry-pick travis-config"
-      run_cmd "git push -f origin #{patchset.topic.name}"
+      git "push origin master"
+      git "cherry-pick travis-config"
+      git "push -f origin #{patchset.topic.name}"
       patchset.topic.name
     end
 
@@ -41,13 +41,19 @@ module PgQuilter
                                     "base" => "master" })
     end
 
-    private
     def run_cmd(cmd)
-      # stdout, stderr
+      FileUtils.cd(PGQuilter::Config::WORK_DIR) do
+        # We ignore stderr for now; we're likely never to need it here
+        result = `#{cmd}`
+        unless $?.exitstatus == 0
+          raise StandardError, "Command '#{cmd}' failed"
+        end
+        result
+      end
     end
 
     def git(cmd)
-      run_cmd "cd '#{Config::WORK_DIR}' && #{cmd}"
+      run_cmd "git #{cmd}"
     end
 
     def has_workspace?
@@ -69,26 +75,28 @@ module PgQuilter
     end
 
     def git_setup
-      run_cmd "git config --global user.name '#{Config::QUILTER_NAME}'"
-      run_cmd "git config --global user.email '#{Config::QUILTER_EMAIL}'"
+      git "config --global user.name '#{PGQuilter::Config::QUILTER_NAME}'"
+      git "config --global user.email '#{PGQuilter::Config::QUILTER_EMAIL}'"
     end
 
     def git_clone
-      run_cmd "mkdir -p '#{Config::WORK_DIR}'"
-      run_cmd "git clone '#{Config::WORK_REPO_URL}' '#{Config::WORK_DIR}'"
-      git "remote add upstream '#{Config::CANONICAL_REPO_URL}'"
+      run_cmd "mkdir -p #{PGQuilter::Config::WORK_DIR}"
+      git "clone #{PGQuilter::Config::WORK_REPO_URL} #{PGQuilter::Config::WORK_DIR}"
+      git "remote add upstream #{Config::CANONICAL_REPO_URL}"
     end
 
 
     def apply_patch(patch)
+      patchset = patch.patchset
       patch_name = "#{patchset.topic.name}-#{patchset.message_id}-#{patch.patchset_order}.patch"
       patch_path = "/tmp/#{patch_name}"
       File.open(patch_path, 'w') do |patch_file|
         patch_file.write patch.body
       end
+      # TODO: does a failed application produce stderr output?
       result = git "apply #{patch_path}"
       PGQuilter::Application.create(base_sha: @base_sha, patch_id: patch.uuid,
-                                    succeeded: result.success?, output: result.stdout) # stderr?
+                                    succeeded: result.success?, output: result)
     end
 
   end
