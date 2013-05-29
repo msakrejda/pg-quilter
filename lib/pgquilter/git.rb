@@ -1,4 +1,4 @@
-module PgQuilter
+module PGQuilter
   class Git
 
     def git_reset
@@ -42,22 +42,22 @@ module PgQuilter
     end
 
     def run_cmd(cmd)
-      FileUtils.cd(PGQuilter::Config::WORK_DIR) do
-        # We ignore stderr for now; we're likely never to need it here
-        result = `#{cmd}`
-        unless $?.exitstatus == 0
-          raise StandardError, "Command '#{cmd}' failed"
-        end
-        result
+      # We ignore stderr for now; we're likely never to need it here
+      result = `#{cmd}`
+      unless $?.exitstatus == 0
+        raise StandardError, "Command '#{cmd}' failed"
       end
+      result
     end
 
     def git(cmd)
-      run_cmd "git #{cmd}"
+      FileUtils.cd(PGQuilter::Config::WORK_DIR) do
+        run_cmd "git #{cmd}"
+      end
     end
 
     def has_workspace?
-      File.directory? WORKSPACE_DIR
+      File.directory? PGQuilter::Config::WORK_DIR
     end
 
     def check_workspace
@@ -71,7 +71,7 @@ module PgQuilter
     end
 
     def ssh_setup
-      run_cmd 'echo "$GITHUB_SSH_KEY" > .ssh/id_rsa'
+      run_cmd 'echo "$GITHUB_SSH_KEY" > $HOME/.ssh/id_rsa'
     end
 
     def git_setup

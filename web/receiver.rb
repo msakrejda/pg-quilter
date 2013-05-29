@@ -4,6 +4,6 @@ require 'mail'
 
 class PGQuilter::Receiver < Sinatra::Base
   post '/mail' do
-    PgQuilter::Receiving.handle(params)
+    PGQuilter::Receiving.handle(params)
   end
 end

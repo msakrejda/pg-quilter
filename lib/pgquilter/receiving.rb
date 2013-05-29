@@ -1,4 +1,4 @@
-module PgQuilter
+module PGQuilter
   module Receiving
     extend self
 
