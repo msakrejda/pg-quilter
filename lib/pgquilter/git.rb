@@ -51,9 +51,11 @@ module PGQuilter
     end
 
     def git(cmd)
+      result = nil
       FileUtils.cd(PGQuilter::Config::WORK_DIR) do
-        run_cmd "git #{cmd}"
+        result = run_cmd "git #{cmd}"
       end
+      result
     end
 
     def has_workspace?
@@ -66,12 +68,12 @@ module PGQuilter
 
     def prepare_workspace
       ssh_setup
-      git_setup
       git_clone
+      git_setup
     end
 
     def ssh_setup
-      run_cmd 'echo "$GITHUB_SSH_KEY" > $HOME/.ssh/id_rsa'
+      run_cmd 'echo "$GITHUB_PRIVATE_KEY" > $HOME/.ssh/id_rsa'
     end
 
     def git_setup
@@ -84,7 +86,6 @@ module PGQuilter
       git "clone #{PGQuilter::Config::WORK_REPO_URL} #{PGQuilter::Config::WORK_DIR}"
       git "remote add upstream #{Config::CANONICAL_REPO_URL}"
     end
-
 
     def apply_patch(patch)
       patchset = patch.patchset
