@@ -1,3 +1,5 @@
+require 'pp'
+
 module PGQuilter
   module Receiving
     extend self
@@ -63,16 +65,19 @@ module PGQuilter
 
     def log(message)
       puts "Dumping message:"
-      puts message.inspect
+      pp message
 
       headers = message['headers']
 
-      puts "Received message"
-      puts "To: #{headers['To']}"
-      puts "From: #{headers['From']}"
-      puts "Date: #{headers['Date']}"
-      puts "Subject: #{headers['Subject']}"
-      puts "Body:\n#{message['plain']}"
+      if headers
+
+        puts "Received message"
+        puts "To: #{headers['To']}"
+        puts "From: #{headers['From']}"
+        puts "Date: #{headers['Date']}"
+        puts "Subject: #{headers['Subject']}"
+        puts "Body:\n#{message['plain']}"
+      end
     end
   end
 end
