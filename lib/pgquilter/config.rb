@@ -6,7 +6,7 @@ module PGQuilter
     GITHUB_USER = 'pg-quilter'
     GITHUB_PASSWORD = ENV['GITHUB_PASSWORD']
 
-    PGSQL_HACKERS = 'pgsql-hackers@postgresql.org'
+    PGSQL_HACKERS = 'pgsql-hackers'
 
     WORK_DIR = '/tmp/postgres'
     WORK_REPO_URL = 'git@github.com:pg-quilter/postgres.git'
