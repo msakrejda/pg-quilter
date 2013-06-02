@@ -5,7 +5,7 @@ module PGQuilter
       git "checkout master"
       git "fetch upstream"
       git "reset --hard upstream/master"
-      @base_sha = git "show-ref -s refs/heads/master"
+      @base_sha = git("show-ref -s refs/heads/master").chomp
     end
 
     def apply_patchset(patchset)

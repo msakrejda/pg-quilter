@@ -41,15 +41,30 @@ module PGQuilter
 
     def is_to_hackers?(message)
       list = message['headers']['X-Mailing-List']
-      list == PGQuilter::Config::PGSQL_HACKERS
+      to_hackers = list == PGQuilter::Config::PGSQL_HACKERS
+      log "to hackers?: #{to_hackers}"
+      to_hackers
     end
 
     def includes_patches?(message)
-      message.has_key?('attachments') &&
-        !(PATCH_TYPES & message['attachments'].map { |a| a[:type] }).empty?
+      has_attachments = message.has_key?('attachments')
+      supported = !(PATCH_TYPES & message['attachments'].map { |a| a[:type] }).empty?
+
+      puts "has atatachments: #{has_attachments}"
+      puts "supported: #{supported}"
+      if has_attachments && !supported
+        message['attachments'].each do |n, a|
+          puts "\tattachment #{n}: #{a[:type]}"
+        end
+      end
+
+      has_attachments && supported
     end
 
     def log(message)
+      puts "Dumping message:"
+      puts message.inspect
+
       headers = message['headers']
 
       puts "Received message"
