@@ -51,7 +51,7 @@ module PGQuilter
     def includes_patches?(message)
       has_attachments = message.has_key?('attachments')
       supported = if has_attachments
-                    !(PATCH_TYPES & message['attachments'].map { |a| a[:type] }).empty?
+                    !(PATCH_TYPES & message['attachments'].map { |k, a| a[:type] }).empty?
                   else
                     []
                   end
