@@ -27,7 +27,7 @@ module PGQuilter
       message_id = message['headers']['Message-ID'].gsub!(/^<|>$/,'')
       patchset = topic.add_patchset(author: author, message_id: message_id)
 
-      message['attachments'].sort.select do |k, attachment|
+      message['attachments'].sort_by { |k, v| k.to_i }.select do |k, attachment|
         PATCH_TYPES.include? attachment[:type]
       end.each do |k, attachment|
         filename = attachment[:filename]
@@ -56,7 +56,7 @@ module PGQuilter
                     []
                   end
 
-      puts "has atatachments: #{has_attachments}"
+      puts "has attachments: #{has_attachments}"
       puts "supported: #{supported}"
       if has_attachments && !supported
         message['attachments'].each do |n, a|
