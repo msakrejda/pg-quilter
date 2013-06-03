@@ -4,9 +4,6 @@ module PGQuilter
   module Receiving
     extend self
 
-    # TODO: also support compressed patches like application/x-gzip
-    PATCH_TYPES = %w(text/x-diff, text/x-patch)
-
     def handle(message)
       return unless message
 
@@ -28,10 +25,10 @@ module PGQuilter
       patchset = topic.add_patchset(author: author, message_id: message_id)
 
       message['attachments'].sort_by { |k, v| k.to_i }.select do |k, attachment|
-        PATCH_TYPES.include? attachment[:type]
+        is_patch?(attachment)
       end.each do |k, attachment|
         filename = attachment[:filename]
-        content = attachment[:tempfile].read
+        content = get_patch_content(attachment)
 
         patchset.add_patch(patchset_order: k.to_i, filename: filename, body: content)
       end
@@ -48,23 +45,41 @@ module PGQuilter
       to_hackers
     end
 
+    def is_patch?(attachment)
+      mime_type = attachment[:type]
+
+      definitely_patch = %w(text/x-diff, text/x-patch).include? mime_type
+      maybe_patch = %w(text/plain, application/octet-stream).include? mime_type
+
+      filename = attachment[:filename]
+
+      definitely_patch || maybe_patch && (filename.end_with? '.patch' || filename.end_with? '.diff')
+    end
+
+    def get_patch_content(attachment)
+      # TODO: also support compressed patches like application/x-gzip;
+      # this will also need tweaks to is_patch? above
+      attachment[:tempfile].read
+    end
+
     def includes_patches?(message)
       has_attachments = message.has_key?('attachments')
-      supported = if has_attachments
-                    !(PATCH_TYPES & message['attachments'].map { |k, a| a[:type] }).empty?
-                  else
-                    []
+      patches = if has_attachments
+                  message['attachments'].select do |index, attachment|
+                    is_patch?(attachment)
                   end
+                else
+                  []
+                end
 
-      puts "has attachments: #{has_attachments}"
-      puts "supported: #{supported}"
-      if has_attachments && !supported
+      puts "has attachments: #{has_attachments} (#{patches.count} patches)"
+      if has_attachments
         message['attachments'].each do |n, a|
-          puts "\tattachment #{n}: #{a[:type]}"
+          puts "\tattachment #{n}: #{a[:type]}  #{a[:filename]}"
         end
       end
 
-      has_attachments && supported
+      has_attachments && patches.count > 0
     end
 
     def log(message)
