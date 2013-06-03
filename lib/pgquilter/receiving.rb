@@ -53,7 +53,7 @@ module PGQuilter
 
       filename = attachment[:filename]
 
-      definitely_patch || maybe_patch && (filename.end_with? '.patch' || filename.end_with? '.diff')
+      definitely_patch || maybe_patch && (filename.end_with?('.patch') || filename.end_with?('.diff'))
     end
 
     def get_patch_content(attachment)
