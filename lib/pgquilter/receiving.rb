@@ -44,7 +44,7 @@ module PGQuilter
     def is_to_hackers?(message)
       list = message['headers']['X-Mailing-List']
       to_hackers = list == PGQuilter::Config::PGSQL_HACKERS
-      log "to hackers?: #{to_hackers}"
+      puts "to hackers?: #{to_hackers}"
       to_hackers
     end
 

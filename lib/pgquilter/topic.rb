@@ -6,6 +6,14 @@ module PGQuilter
 
     SUBJECT_WAS_RE = /.*\(\s*was:?\s*([^)]+)\s*\)/
 
+    def self.active
+      self.where(active: true)
+    end
+
+    def self.without_build(for_sha)
+      # find topics that have no applications for the given SHA
+    end
+
     def self.for_subject(subject)
       normalized_subject = self.normalize(subject)
       Topic.find_or_create(name: normalized_subject)

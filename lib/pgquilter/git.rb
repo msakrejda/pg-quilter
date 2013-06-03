@@ -1,6 +1,10 @@
 module PGQuilter
   class Git
 
+    def check_upstream_sha
+      (git "ls-remote #{PGQuilter::Config::CANONICAL_REPO_URL}").split("\t").first
+    end
+
     def git_reset
       git "checkout master"
       git "fetch upstream"
@@ -9,14 +13,18 @@ module PGQuilter
     end
 
     def apply_patchset(patchset)
+      # TODO: report failure
+      check_workspace
       git_reset
-      git "checkout -b #{patchset.topic.name}"
+      git "checkout -B #{patchset.topic.name}"
       # TODO: it would be useful to create a commit moving us to master branch
       # without actually losing commit history
       git "reset --hard master"
       patchset.patches.sort_by(&:patchset_order).each do |patch|
         apply_patch(patch)
       end
+      # TODO: better commit message, e.g., referencing the actual
+      # patch e-mails (by link or at least ID)
       git "commit . --author='#{author}' -m 'Applying patch set for #{patchset.topic.name}'"
     end
 
@@ -32,8 +40,8 @@ module PGQuilter
       # for now, do this only on the first patchset (later, add comments
       # for each subsequent patchset)
       # TODO: different class?
-      user = Config::GITHUB_USER
-      github = Github.new(login: user, password: Config::GITHUB_PASSWORD)
+      github = Github.new(login: PGQuilter::Config::GITHUB_USER,
+                          password: PGQuilter::Config::GITHUB_PASSWORD)
       github.pull_requests.create(user, 'postgres',
                                   { "title" => "#{branch}",
                                     "body" => "",
@@ -84,7 +92,7 @@ module PGQuilter
     def git_clone
       run_cmd "mkdir -p #{PGQuilter::Config::WORK_DIR}"
       git "clone #{PGQuilter::Config::WORK_REPO_URL} #{PGQuilter::Config::WORK_DIR}"
-      git "remote add upstream #{Config::CANONICAL_REPO_URL}"
+      git "remote add upstream #{PGQuilter::Config::CANONICAL_REPO_URL}"
     end
 
     def apply_patch(patch)
