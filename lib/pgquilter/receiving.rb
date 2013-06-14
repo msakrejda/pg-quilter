@@ -54,7 +54,7 @@ module PGQuilter
       filename = attachment[:filename]
 
       is_patch = definitely_patch || maybe_patch && filename =~ /\.(?:patch|diff)\z/
-      puts "\tattachment #{filename} (type #{type}) is patch: #{is_patch}"
+      puts "\tattachment #{filename} (type #{mime_type}) is patch: #{is_patch}"
       is_patch
     end
 
