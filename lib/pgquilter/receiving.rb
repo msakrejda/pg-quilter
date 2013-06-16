@@ -1,15 +1,12 @@
 require 'pp'
+require 'logger'
 
 module PGQuilter
   module Receiving
+    include Loggable
     extend self
 
     class Failure < Sequel::Model; end
-
-    def log(msg)
-      @logger ||= Logger.new(STDOUT)
-      @logger.debug(msg)
-    end
 
     def handle(message)
       return unless message

@@ -1,5 +1,7 @@
 module PGQuilter
   module Config
+    LOG_LEVEL = ENV['LOG_LEVEL']
+
     QUILTER_NAME = 'pg-quilter'
     QUILTER_EMAIL = ENV['QUILTER_EMAIL']
 

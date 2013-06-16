@@ -12,6 +12,7 @@ $:.unshift File.dirname(__FILE__)
 DB = Sequel.connect(ENV['DATABASE_URL'])
 
 require 'pgquilter/config'
+require 'pgquilter/loggable'
 require 'pgquilter/application'
 require 'pgquilter/git'
 require 'pgquilter/patch'
