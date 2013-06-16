@@ -55,12 +55,11 @@ module PGQuilter
     def is_patch?(attachment)
       mime_type = attachment[:type]
 
-      definitely_patch = %w(text/x-diff, text/x-patch).include? mime_type
-      maybe_patch = %w(text/plain, application/octet-stream).include? mime_type
-
+      definitely_patch = %w(text/x-diff text/x-patch).include? mime_type
+      maybe_patch = %w(text/x-plain application/octet-stream).include? mime_type
       filename = attachment[:filename]
 
-      is_patch = definitely_patch || maybe_patch && filename =~ /\.(?:patch|diff)\z/
+      is_patch = definitely_patch || (maybe_patch && filename =~ /\.(?:patch|diff)\z/)
       log "\tattachment #{filename} (type #{mime_type}) is patch: #{is_patch}"
       is_patch
     end
