@@ -4,6 +4,8 @@ module PGQuilter
   module Receiving
     extend self
 
+    class Failure < Sequel::Model; end
+
     def log(msg)
       @logger ||= Logger.new(STDOUT)
       @logger.debug(msg)
@@ -29,13 +31,16 @@ module PGQuilter
       message_id = message['headers']['Message-ID'].gsub!(/^<|>$/,'')
       patchset = topic.add_patchset(author: author, message_id: message_id)
 
-      message['attachments'].sort_by { |k, v| k.to_i }.select do |k, attachment|
-        is_patch?(attachment)
-      end.each do |k, attachment|
-        filename = attachment[:filename]
-        content = get_patch_content(attachment)
-
-        patchset.add_patch(patchset_order: k.to_i, filename: filename, body: content)
+      begin
+        message['attachments'].sort_by { |k, v| k.to_i }.select do |k, attachment|
+          is_patch?(attachment)
+        end.each do |k, attachment|
+          filename = attachment[:filename]
+          content = get_patch_content(attachment)
+          patchset.add_patch(patchset_order: k.to_i, filename: filename, body: content)
+        end
+      rescue StandardError => e
+        Failure.create(message_id: message_id, error: e.message)
       end
     end
 
