@@ -4,18 +4,23 @@ module PGQuilter
   module Receiving
     extend self
 
+    def log(msg)
+      @logger ||= Logger.new(STDOUT)
+      @logger.debug(msg)
+    end
+
     def handle(message)
       return unless message
 
-      puts "You've got mail!"
-      log message
+      log "You've got mail!"
+      log_message message
       if of_interest? message
         process message
       end
     end
 
     def process(message)
-      puts "Processing message"
+      log "Processing message"
 
       subject = message['headers']['Subject']
       topic = Topic.for_subject(subject)
@@ -41,7 +46,7 @@ module PGQuilter
     def is_to_hackers?(message)
       list = message['headers']['X-Mailing-List']
       to_hackers = list == PGQuilter::Config::PGSQL_HACKERS
-      puts "to hackers?: #{to_hackers}"
+      log "to hackers?: #{to_hackers}"
       to_hackers
     end
 
@@ -54,7 +59,7 @@ module PGQuilter
       filename = attachment[:filename]
 
       is_patch = definitely_patch || maybe_patch && filename =~ /\.(?:patch|diff)\z/
-      puts "\tattachment #{filename} (type #{mime_type}) is patch: #{is_patch}"
+      log "\tattachment #{filename} (type #{mime_type}) is patch: #{is_patch}"
       is_patch
     end
 
@@ -74,30 +79,29 @@ module PGQuilter
                   []
                 end
 
-      puts "has attachments: #{has_attachments} (#{patches.count} patches)"
+      log "has attachments: #{has_attachments} (#{patches.count} patches)"
       if has_attachments
         message['attachments'].each do |n, a|
-          puts "\tattachment #{n}: #{a[:type]}  #{a[:filename]}"
+          log "\tattachment #{n}: #{a[:type]}  #{a[:filename]}"
         end
       end
 
       has_attachments && patches.count > 0
     end
 
-    def log(message)
-      puts "Dumping message:"
-      pp message
+    def log_message(message)
+      log "Dumping message:"
+      log message.pretty_inspect
 
       headers = message['headers']
 
       if headers
-
-        puts "Received message"
-        puts "To: #{headers['To']}"
-        puts "From: #{headers['From']}"
-        puts "Date: #{headers['Date']}"
-        puts "Subject: #{headers['Subject']}"
-        puts "Body:\n#{message['plain']}"
+        log "Received message"
+        log "To: #{headers['To']}"
+        log "From: #{headers['From']}"
+        log "Date: #{headers['Date']}"
+        log "Subject: #{headers['Subject']}"
+        log "Body:\n#{message['plain']}"
       end
     end
   end
