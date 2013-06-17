@@ -71,17 +71,15 @@ module PGQuilter
     end
 
     def includes_patches?(message)
-      patches = (message['attachments'] || []).select do |index, attachment|
+      attachments = message['attachments'] || []
+      patches = attachments.select do |index, attachment|
         is_patch?(attachment)
       end
-      log "has attachments: #{has_attachments} (#{patches.count} patches)"
-      if has_attachments
-        message['attachments'].each do |n, a|
-          log "\tattachment #{n}: #{a[:type]}  #{a[:filename]}"
-        end
+      log "has #{attachments.count} attachment(s); #{patches.count} patch(es)"
+      attachments.each do |n, a|
+        log "\tattachment #{n}: #{a[:type]}  #{a[:filename]}"
       end
-
-      has_attachments && patches.count > 0
+      !patches.empty?
     end
 
     def log_message(message)
