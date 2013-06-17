@@ -10,6 +10,7 @@ gem 'thin'
 gem 'mail'
 gem 'pry'
 gem 'github_api'
+gem 'rake'
 
 group :test do
   gem "rspec"
