@@ -11,7 +11,14 @@ module PGQuilter
     end
 
     def self.without_build(for_sha)
-      # find topics that have no applications for the given SHA
+      self.distinct(:topics__uuid)
+        .inner_join(:patchsets, topic_id: :topics__uuid)
+        .inner_join(:patches, patchset_id: :patchsets__uuid)
+        .inner_join(:applications, patch_id: :patches__uuid)
+        .where(active: true)
+        .order(:topics__uuid, :patchsets__created_at,
+               Sequel.desc(:patches__patchset_order),
+               Sequel.desc(:applications__created_at))
     end
 
     def self.for_subject(subject)
