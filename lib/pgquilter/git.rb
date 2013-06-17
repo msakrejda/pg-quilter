@@ -10,44 +10,76 @@ module PGQuilter
       @g.check_upstream_sha
     end
 
+    def branch(patchset)
+      patchset.topic.name
+    end
+
     def apply_patchset(patchset)
       # TODO: report failure
       check_workspace
-      @g.reset
-      @g.prepare_branch patchset.topic.name
+      branch = branch(patchset)
+      base_sha = @g.reset
+      @g.prepare_branch branch
 
-      # TODO: track whether any patch has been successfully applied
-      patchset.patches.sort_by(&:patchset_order).each do |patch|
-        apply_patch(patch)
+      applications = patchset.patches.sort_by(&:patchset_order).map do |patch|
+        apply_patch(base_sha, patch)
       end
+
+      unless applications.all?(:succeeded)
+        # TODO: handle this--update the PR as failed? intentionally
+        # push badly-applied patch?
+      end
+
+      commit_msg = commit_message(branch, applications)
+      @g.git_commit(commit_msg, author)
+    end
+
+    def commit_message(branch, applications)
       # TODO: better commit message, e.g., referencing the actual
       # patch e-mails (by link or at least ID)
-      @g.git_commit("Applying patch set for #{patchset.topic.name}", author)
+      "Applying patch set for #{branch}"
     end
 
     def push_to_github(patchset)
       # push both master and the patch so we always have the latest PR
-      branch = patchset.topic.name
-      @g.update_branch(branch)
-    end
-
-    def submit_pull_request(branch)
-      # for now, do this only on the first patchset (later, add comments
-      # for each subsequent patchset)
-      github = Github.new(login: PGQuilter::Config::GITHUB_USER,
-                          password: PGQuilter::Config::GITHUB_PASSWORD)
-      github.pull_requests.create(user, 'postgres',
-                                  { "title" => "#{branch}",
-                                    "body" => "",
-                                    "head" => branch,
-                                    "base" => "master" })
+      @g.update_branch branch(patchset)
     end
 
     def check_workspace
       @g.prepare_workspace unless @g.has_workspace?
     end
 
-    def apply_patch(patch)
+    def ensure_pull_request(patchset)
+      branch = branch(patchset)
+      submit_pull_request(branch) unless has_pull_request?(branch)
+    end
+
+    def submit_pull_request(branch)
+      # for now, do this only on the first patchset (later, add comments
+      # for each subsequent patchset)
+      github.pull_requests.create(user, 'postgres',
+                                  { "title" => branch,
+                                    "body" => "",
+                                    "head" => branch,
+                                    "base" => "master" })
+    end
+
+    private
+
+    def github
+      @github ||= Github.new(login: PGQuilter::Config::GITHUB_USER,
+                             password: PGQuilter::Config::GITHUB_PASSWORD)
+    end
+
+    def has_pull_request?(branch)
+      prs = github.pull_requests.with(user: PGQuilter::Config::GITHUB_USER,
+                                      repo: 'postgres').list
+      result = prs.find { |pr| pr.title == branch }
+      !result.nil?
+    end
+
+    # N.B.: returns application
+    def apply_patch(base_sha, patch)
       patchset = patch.patchset
       patch_name = "#{patchset.topic.name}-#{patchset.message_id}-#{patch.patchset_order}.patch"
       patch_path = "/tmp/#{patch_name}"
@@ -58,9 +90,8 @@ module PGQuilter
       result = @g.apply_patch(patch_path)
       # TODO: properly detect successful patch application
       failed =~ /does not apply\Z/
-      patch.add_application(base_sha: @base_sha,
+      patch.add_application(base_sha: base_sha,
                             succeeded: failed.nil?, output: result)
-      failed.nil?
     end
 
   end

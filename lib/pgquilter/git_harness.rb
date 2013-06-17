@@ -23,11 +23,12 @@ module PGQuilter
       result
     end
 
+    # reset master branch to upstream and return the new location SHA
     def reset
       git "checkout master"
       git "fetch upstream"
       git "reset --hard upstream/master"
-      @base_sha = git("show-ref -s refs/heads/master").chomp
+      git("show-ref -s refs/heads/master").chomp
     end
 
     def prepare_branch(branch)
