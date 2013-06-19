@@ -32,9 +32,11 @@ module PGQuilter
     end
 
     def prepare_branch(branch)
+      # N.B.: the git 1.8.1.2 on the Heroku stack image does not support -B
+      git "branch '#{branch}' || true"
+      git "checkout '#{branch}'"
       # TODO: it would be useful to create a commit moving us to master branch
       # without actually losing commit history
-      git "checkout -B '#{branch}'"
       git "reset --hard master"
     end
     

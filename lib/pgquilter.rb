@@ -14,6 +14,7 @@ DB = Sequel.connect(ENV['DATABASE_URL'])
 require 'pgquilter/config'
 require 'pgquilter/loggable'
 require 'pgquilter/application'
+require 'pgquilter/git_harness'
 require 'pgquilter/git'
 require 'pgquilter/patch'
 require 'pgquilter/patchset'
