@@ -67,7 +67,7 @@ module PGQuilter
 
     def update_branch(branch)
       git "push origin master"
-      git "cherry-pick travis-config"
+      git "cherry-pick origin/travis-config"
       git "push -f origin #{branch}"
     end
 
