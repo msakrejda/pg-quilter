@@ -57,7 +57,7 @@ module PGQuilter
     def submit_pull_request(branch)
       # for now, do this only on the first patchset (later, add comments
       # for each subsequent patchset)
-      github.pull_requests.create(user, 'postgres',
+      github.pull_requests.create(PGQuilter::Config::GITHUB_USER, 'postgres',
                                   { "title" => branch,
                                     "body" => "",
                                     "head" => branch,
