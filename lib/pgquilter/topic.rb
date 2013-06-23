@@ -4,7 +4,7 @@ module PGQuilter
   class Topic < Sequel::Model
     one_to_many :patchsets
 
-    SUBJECT_WAS_RE = /.*\(\s*was:?\s*([^)]+)\s*\)/
+    SUBJECT_WAS_RE = /.*[\(\[]\s*was:?\s*([^\)]+)\s*[\)\]]/
 
     def self.active
       self.where(active: true)
