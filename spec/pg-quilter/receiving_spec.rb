@@ -1,13 +1,13 @@
 require 'spec_helper'
 
-describe PGQuilter::Receiving do
+describe PGQuilter::Receiving, '#is_to_hackers?' do
   it "recognizes messages to hackers" do
     message = { "headers" => { "X-Mailing-List" => "pgsql-hackers" } }
     expect(PGQuilter::Receiving.is_to_hackers? message).to be_true
   end
 end
 
-describe PGQuilter::Receiving, 'recognizing patches' do
+describe PGQuilter::Receiving, '#is_patch?' do
   probably_patches = [
                       { type: 'text/x-diff', filename: 'nondescript' },
                       { type: 'text/x-patch', filename: 'nondescript' },

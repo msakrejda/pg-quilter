@@ -12,10 +12,11 @@ module PGQuilter
 
     # Check the location of the master branch of upstream repository
     def self.check_upstream_sha
-      (git %W(ls-remote #{PGQuilter::Config::UPSTREAM_REPO_URL} master)).split("\t").first
+      puts "checking #{::PGQuilter::Config::UPSTREAM_REPO_URL}"
+      (run_cmd "git ls-remote #{::PGQuilter::Config::UPSTREAM_REPO_URL} master").split("\t").first
     end
 
-    def run_cmd(cmd)
+    def self.run_cmd(cmd)
       # We ignore stderr for now; we're likely never to need it here
       # N.B.: this is super-unsafe; don't run with untrusted input
       result = `#{cmd}`
@@ -25,8 +26,8 @@ module PGQuilter
       result
     end
 
-    def git(subcmd, *opts)
-      FileUtils.cd(PGQuilter::Config::WORK_DIR) do
+    def self.git(subcmd, *opts)
+      FileUtils.cd(::PGQuilter::Config::WORK_DIR) do
         command = opts.unshift('git', subcmd)
         Open3.popen(*command) do |stdin, stdout, stderr, wthr|
           exitstatus = wthr.value.exitstatus
@@ -58,7 +59,7 @@ module PGQuilter
     end
     
     def has_workspace?
-      File.directory? PGQuilter::Config::WORK_DIR
+      File.directory? ::PGQuilter::Config::WORK_DIR
     end
 
     def prepare_workspace
@@ -72,14 +73,14 @@ module PGQuilter
     end
 
     def git_setup
-      git %W(config --global user.name #{PGQuilter::Config::QUILTER_NAME})
-      git %W(config --global user.email #{PGQuilter::Config::QUILTER_EMAIL})
+      git %W(config --global user.name #{::PGQuilter::Config::QUILTER_NAME})
+      git %W(config --global user.email #{::PGQuilter::Config::QUILTER_EMAIL})
     end
 
     def git_clone
-      run_cmd "mkdir -p #{PGQuilter::Config::WORK_DIR}"
-      git %W(clone #{PGQuilter::Config::WORK_REPO_URL} #{PGQuilter::Config::WORK_DIR})
-      git %W(remote add upstream #{PGQuilter::Config::UPSTREAM_REPO_URL})
+      run_cmd "mkdir -p #{::PGQuilter::Config::WORK_DIR}"
+      git %W(clone #{::PGQuilter::Config::WORK_REPO_URL} #{::PGQuilter::Config::WORK_DIR})
+      git %W(remote add upstream #{::PGQuilter::Config::UPSTREAM_REPO_URL})
     end
 
     def update_branch(branch)

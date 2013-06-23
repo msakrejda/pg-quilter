@@ -4,7 +4,7 @@ module PGQuilter
     def logger
       unless @logger
         @logger ||= Logger.new(STDOUT)
-        @logger.level = Logger.const_get(PGQuilter::Config::LOG_LEVEL)
+        @logger.level = Logger.const_get(::PGQuilter::Config::LOG_LEVEL)
       end
       @logger
     end
