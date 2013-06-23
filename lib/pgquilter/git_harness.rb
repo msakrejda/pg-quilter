@@ -12,7 +12,7 @@ module PGQuilter
 
     # Check the location of the master branch of upstream repository
     def self.check_upstream_sha
-      (git %W(ls-remote #{PGQuilter::Config::CANONICAL_REPO_URL} master)).split("\t").first
+      (git %W(ls-remote #{PGQuilter::Config::UPSTREAM_REPO_URL} master)).split("\t").first
     end
 
     def run_cmd(cmd)
@@ -79,7 +79,7 @@ module PGQuilter
     def git_clone
       run_cmd "mkdir -p #{PGQuilter::Config::WORK_DIR}"
       git %W(clone #{PGQuilter::Config::WORK_REPO_URL} #{PGQuilter::Config::WORK_DIR})
-      git %W(remote add upstream #{PGQuilter::Config::CANONICAL_REPO_URL})
+      git %W(remote add upstream #{PGQuilter::Config::UPSTREAM_REPO_URL})
     end
 
     def update_branch(branch)
