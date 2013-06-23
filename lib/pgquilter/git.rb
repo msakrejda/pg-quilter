@@ -1,4 +1,5 @@
-# -*- coding: utf-8 -*-
+require 'tempfile'
+
 module PGQuilter
   class Git
 
@@ -80,14 +81,7 @@ module PGQuilter
 
     # N.B.: returns application
     def apply_patch(base_sha, patch)
-      patchset = patch.patchset
-      patch_name = "#{patchset.topic.name}-#{patchset.message_id}-#{patch.patchset_order}.patch"
-      patch_path = "/tmp/#{patch_name}"
-      File.open(patch_path, 'w') do |patch_file|
-        patch_file.write patch.body
-      end
-      # TODO: this is kind of a gross hack around patch application
-      result = @g.apply_patch(patch_path)
+      result = @g.apply_patch(patch.body)
       # TODO: properly detect successful patch application
       failed =~ /does not apply\Z/
       patch.add_application(base_sha: base_sha,

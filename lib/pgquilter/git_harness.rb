@@ -88,8 +88,12 @@ module PGQuilter
       git %w(push -f origin #{branch})
     end
 
-    def apply_patch(patch_path)
-      git %W(apply --verbose #{patch_path})
+    def apply_patch(patch_body)
+      Tempfile.open('pg-quilter-postgres', '/tmp') do |f|
+        f.write patch_body
+        f.flush
+        git %W(apply --verbose #{f.path})
+      end
     rescue ExecError => e
       e.stderr
     end
