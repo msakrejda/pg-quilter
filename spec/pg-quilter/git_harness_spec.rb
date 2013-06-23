@@ -117,6 +117,14 @@ describe PGQuilter::GitHarness, 'remote tests' do
       expect(in_workspace("git rev-parse #{branch}")).to eq(in_workspace("git rev-parse master"))
     end
 
+    it "commits changes" do
+      in_workspace("echo '* logical replication' > TODO")
+      message = 'add TODO list'
+      author  = 'Gladys Vanderhoff <gladys@vanderhoff.net>'
+      subject.git_commit(message, author)
+      expect(in_workspace("git log -1 --pretty='format:%an <%ae>'")).to eq(author)
+      expect(in_workspace("git log -1 --pretty='format:%s'")).to eq(message)
+    end
 
   end
 

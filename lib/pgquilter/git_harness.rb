@@ -83,8 +83,10 @@ module PGQuilter
       raise PatchError, e.stderr
     end
 
+    # Commit all local changes
     def git_commit(message, author)
-      git %W(commit . -m #{message} --author=#{author})
+      git %W(add .)
+      git %W(commit -m #{message} --author=#{author})
     end
 
     private
