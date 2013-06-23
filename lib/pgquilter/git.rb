@@ -15,24 +15,22 @@ module PGQuilter
       patchset.topic.name
     end
 
+    # Apply a patchset. Stop applying at first failing patch (but still record it).
     def apply_patchset(patchset)
-      # TODO: report failure
       check_workspace
       branch = branch(patchset)
       base_sha = @g.reset
       @g.prepare_branch branch
 
-      applications = patchset.patches.sort_by(&:patchset_order).map do |patch|
-        apply_patch(base_sha, patch)
-      end
+      applications = []
 
-      unless applications.all?(:succeeded)
-        # TODO: handle this--update the PR as failed? intentionally
-        # push badly-applied patch?
+      patchset.patches.sort_by(&:patchset_order).take_while do |patch|
+        application = apply_patch(base_sha, patch)
+        applications << application
+        commit_msg = commit_message(branch, application)
+        @g.git_commit(commit_msg, patchset.author)
+        application.succeeded
       end
-
-      commit_msg = commit_message(branch, applications)
-      @g.git_commit(commit_msg, author)
     end
 
     def commit_message(branch, applications)
@@ -87,9 +85,9 @@ module PGQuilter
       result = e.message
       success = false
     ensure
-      patch.add_application(base_sha: base_sha,
-                            succeeded: success, output: result)
+      application = patch.add_application(base_sha: base_sha,
+                                          succeeded: success, output: result)
+      return application
     end
-
   end
 end

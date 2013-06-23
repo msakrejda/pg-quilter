@@ -10,6 +10,11 @@ module PGQuilter
       # mande in the meantime. That's fine--the underlying
       # infrastructure records the correct SHA, and this only gives us
       # an indication of whether we need to rebuild at all.
+
+      # TODO: avoid rebuilding if the topic build previously failed
+      # and upstream has progressed but there are no new patchsets:
+      # this situation is unlikely to have fixed anything with the
+      # patch
       candidates = Topic.active.without_build(for_sha)
 
       log "Starting builds for #{candidates.count} topics"
