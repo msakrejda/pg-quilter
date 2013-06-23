@@ -8,9 +8,9 @@ describe PGQuilter::GitHarness, 'remote tests' do
   around(:each) do |example|
     Dir.mktmpdir('pg-quilter-test-repo') do |work|
       system("tar -C #{work} -x -z -f spec/repo-template/work/dotgit.tgz")
-      @tmp_work_url = "file://#{work}"
+      @work_remote_dir = work
       Dir.mktmpdir('pg-quilter-test-repo') do |upstream|
-        @tmp_upstream_url = "file://#{upstream}"
+        @upstream_remote_dir = upstream
         system("tar -C #{upstream} -x -z -f spec/repo-template/upstream/dotgit.tgz")
         Dir.mktmpdir('pg-quilter-workspace') do |workspace|
           @workspace_dir = "#{workspace}/postgres"
@@ -24,13 +24,31 @@ describe PGQuilter::GitHarness, 'remote tests' do
     # TODO; unfortunately, around blocks don't share state with the
     # fixtures, so there's no way to stub out the constants above; we
     # use this gross hack
-    stub_const('PGQuilter::Config::WORK_REPO_URL', @tmp_work_url)
-    stub_const('PGQuilter::Config::UPSTREAM_REPO_URL', @tmp_upstream_url)
+    stub_const('PGQuilter::Config::WORK_REPO_URL', "file://#{@work_remote_dir}")
+    stub_const('PGQuilter::Config::UPSTREAM_REPO_URL', "file://#{@upstream_remote_dir}")
     stub_const('PGQuilter::Config::WORK_DIR', @workspace_dir)
   end
 
+  def in_dir(dir, cmd)
+    FileUtils.cd(dir) do
+      return `#{cmd}`.chomp
+    end
+  end
+
+  def in_upstream(cmd)
+    in_dir(@upstream_remote_dir, cmd)
+  end
+
+  def in_work(cmd)
+    in_dir(@work_remote_dir, cmd)
+  end
+
+  def in_workspace(cmd)
+    in_dir(@workspace_dir, cmd)
+  end
+
   it "can check upstream sha" do
-    actual_sha = `cd #{@tmp_upstream_url.sub(/\Afile:\/\//, '')} && git rev-parse master`.chomp
+    actual_sha = in_upstream('git rev-parse master')
     expect(subject.check_upstream_sha).to eq(actual_sha)
   end
 
@@ -40,18 +58,6 @@ describe PGQuilter::GitHarness, 'remote tests' do
     expect(File.directory? ::PGQuilter::Config::WORK_DIR).to be_true
   end
 
-  def in_upstream(cmd)
-    `cd #{@tmp_upstream_url.sub(/\Afile:\/\//, '')} && #{cmd}`.chomp
-  end
-
-  def in_work(cmd)
-    `cd #{@tmp_work_url.sub(/\Afile:\/\//, '')} && #{cmd}`.chomp
-  end
-
-  def in_workspace(cmd)
-    `cd #{@workspace_dir} && #{cmd}`.chomp
-  end
-
   context "with workspace" do
     before(:each) do
       subject.prepare_workspace
@@ -59,19 +65,17 @@ describe PGQuilter::GitHarness, 'remote tests' do
 
     it "configures git user metadata correctly" do
       subject.git_setup
-      user = in_workspace("git config user.name")
-      email = in_workspace("git config user.email")
-
-      expect(user).to eq(PGQuilter::Config::QUILTER_NAME)
-      expect(email).to eq(PGQuilter::Config::QUILTER_EMAIL)
+      expect(in_workspace("git config user.name")).to eq(PGQuilter::Config::QUILTER_NAME)
+      expect(in_workspace("git config user.email")).to eq(PGQuilter::Config::QUILTER_EMAIL)
     end
 
     it "can reset work repo to upstream" do
       upstream_sha = in_upstream("git rev-parse master")
       expect(subject.reset).to eq(upstream_sha)
-      work_sha = in_workspace("git rev-parse master")
-      expect(work_sha).to eq(upstream_sha)
+      workspace_sha = in_workspace("git rev-parse master")
+      expect(workspace_sha).to eq(upstream_sha)
     end
 
   end
+
 end
