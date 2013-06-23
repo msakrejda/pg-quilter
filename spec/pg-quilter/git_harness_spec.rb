@@ -124,6 +124,7 @@ describe PGQuilter::GitHarness, 'remote tests' do
       subject.git_commit(message, author)
       expect(in_workspace("git log -1 --pretty='format:%an <%ae>'")).to eq(author)
       expect(in_workspace("git log -1 --pretty='format:%s'")).to eq(message)
+      expect(in_workspace("git show -p HEAD")).to match(message)
     end
 
   end

@@ -82,9 +82,10 @@ module PGQuilter
     # Applies a patch and returns the resulting Application
     def apply_patch(base_sha, patch)
       result = @g.apply_patch(patch.body)
+      success = true
     rescue PatchError => e
       result = e.message
-      raise
+      success = false
     ensure
       patch.add_application(base_sha: base_sha,
                             succeeded: success, output: result)

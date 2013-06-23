@@ -16,17 +16,21 @@ module PGQuilter
       (run_cmd "git ls-remote #{::PGQuilter::Config::UPSTREAM_REPO_URL} master").split("\t").first
     end
 
+    # True if a workspace has been prepared; false otherwise
     def has_workspace?
       File.directory? ::PGQuilter::Config::WORK_DIR
     end
 
+    # Prepare a workspace: configure ssh keys and set up the local git
+    # repository and relevant remotes
     def prepare_workspace
       ssh_setup
       git_clone
       git_setup
     end
 
-    # reset master branch to upstream and return the new location SHA
+    # Update upstream, reset master branch to latest upstream change,
+    # and return the new HEAD sha
     def reset
       git %w(checkout master)
       git %w(fetch upstream)
@@ -34,6 +38,7 @@ module PGQuilter
       (git %w(show-ref -s refs/heads/master)).chomp
     end
 
+    # Create given branch if necessary and reset it to master
     def prepare_branch(branch)
       # N.B.: the git 1.8.1.2 on the Heroku stack image does not support -B
       begin
@@ -47,6 +52,7 @@ module PGQuilter
       git %w(reset --hard master)
     end
 
+    # Set up ssh keys for git command
     def ssh_setup
       if ENV.has_key? 'GITHUB_PRIVATE_KEY'
         # TODO: we skip this when the key is not set for testing;
@@ -72,6 +78,8 @@ module PGQuilter
       git %w(push -f origin #{branch})
     end
 
+    # Apply the given patch body to the working directory (does not
+    # commit changes)
     def apply_patch(patch_body)
       Tempfile.open('pg-quilter-postgres', '/tmp') do |f|
         f.write patch_body
@@ -83,7 +91,7 @@ module PGQuilter
       raise PatchError, e.stderr
     end
 
-    # Commit all local changes
+    # Commit all local changes (including new files)
     def git_commit(message, author)
       git %W(add .)
       git %W(commit -m #{message} --author=#{author})
