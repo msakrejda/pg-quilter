@@ -43,7 +43,11 @@ module PGQuilter
     end
 
     def ssh_setup
-      run_cmd 'echo "$GITHUB_PRIVATE_KEY" > $HOME/.ssh/id_rsa'
+      if ENV.has_key? 'GITHUB_PRIVATE_KEY'
+        # TODO: we skip this when the key is not set for testing;
+        # figure out a better approach
+        run_cmd 'echo "$GITHUB_PRIVATE_KEY" > $HOME/.ssh/id_rsa'
+      end
     end
 
     def git_setup
