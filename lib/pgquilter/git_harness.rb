@@ -35,7 +35,11 @@ module PGQuilter
 
     def prepare_branch(branch)
       # N.B.: the git 1.8.1.2 on the Heroku stack image does not support -B
-      git %W(branch #{branch}) rescue nil
+      begin
+        git %W(branch #{branch})
+      rescue ->(e) { e.message =~ /fatal: A branch named .* already exists\./ }
+        # ignore
+      end
       git %W(checkout #{branch})
       # TODO: it would be useful to create a commit moving us to master branch
       # without actually losing commit history

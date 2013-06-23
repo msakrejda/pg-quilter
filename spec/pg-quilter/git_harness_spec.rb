@@ -28,6 +28,10 @@ describe PGQuilter::GitHarness, 'remote tests' do
     stub_const('PGQuilter::Config::UPSTREAM_REPO_URL', "file://#{@upstream_remote_dir}")
     stub_const('PGQuilter::Config::WORK_DIR', @workspace_dir)
   end
+  
+  def rstr(len)
+    rand(36**len).to_s(36)
+  end
 
   def in_dir(dir, cmd)
     FileUtils.cd(dir) do
@@ -74,6 +78,20 @@ describe PGQuilter::GitHarness, 'remote tests' do
       expect(subject.reset).to eq(upstream_sha)
       workspace_sha = in_workspace("git rev-parse master")
       expect(workspace_sha).to eq(upstream_sha)
+    end
+
+
+    it "can prepare a new branch" do
+      branch = 
+      subject.prepare_branch(branch)
+    end
+    def prepare_branch(branch)
+      # N.B.: the git 1.8.1.2 on the Heroku stack image does not support -B
+      git %W(branch #{branch}) rescue nil
+      git %W(checkout #{branch})
+      # TODO: it would be useful to create a commit moving us to master branch
+      # without actually losing commit history
+      git %w(reset --hard master)
     end
 
   end
