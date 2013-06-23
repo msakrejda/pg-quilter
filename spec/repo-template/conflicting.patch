@@ -1,0 +1,7 @@
+diff --git a/test b/test
+index 3b18e51..032b687 100644
+--- a/test
++++ b/test
+@@ -1 +1,2 @@
+ hello world
++goodbye

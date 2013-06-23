@@ -93,6 +93,31 @@ describe PGQuilter::GitHarness, 'remote tests' do
       expect(in_workspace("git rev-parse #{branch}")).to eq(in_workspace("git rev-parse master"))
     end
 
+    it "can apply a clean patch" do
+      patch = IO.read('spec/repo-template/clean.patch')
+      branch = rstr(10)
+      subject.prepare_branch(branch)
+
+      expect { subject.apply_patch(patch) }.to_not raise_error
+      # N.B.: we chomp in the helper command, so we need to do it to the patch
+      expect(in_workspace("git add . && git diff master")).to eq(patch.chomp)
+    end
+
+    it "fails to apply a patch with conflicts" do
+      patch = IO.read('spec/repo-template/conflicting.patch')
+      branch = rstr(10)
+      subject.reset
+      subject.prepare_branch(branch)
+
+      expect { subject.apply_patch(patch) }.to raise_error do |e|
+        expect(e.class).to eq(PGQuilter::GitHarness::PatchError)
+        expect(e.message =~ /patch does not apply/)
+      end
+      # N.B.: we chomp in the helper command, so we need to do it to the patch
+      expect(in_workspace("git rev-parse #{branch}")).to eq(in_workspace("git rev-parse master"))
+    end
+
+
   end
 
 end

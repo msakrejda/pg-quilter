@@ -9,6 +9,7 @@ module PGQuilter
         @stderr = stderr
       end
     end
+    class PatchError < StandardError; end
 
     # Check the location of the master branch of upstream repository
     def check_upstream_sha
@@ -77,8 +78,9 @@ module PGQuilter
         f.flush
         git %W(apply --verbose #{f.path})
       end
-    rescue ExecError => e
-      e.stderr
+    rescue ->(e) { e.respond_to?(:stderr) && e.stderr =~ /patch does not apply/ } => e
+      # TODO: do better than the above heuristic
+      raise PatchError, e.stderr
     end
 
     def git_commit(message, author)
