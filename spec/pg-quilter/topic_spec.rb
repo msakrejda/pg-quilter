@@ -5,6 +5,9 @@ describe PGQuilter::Topic, '#normalize' do
   canonical = 'hello-world'
   normalizations = [
                     "hello world",
+                    "hello  world",
+                    "!hello world",
+                    "hello world!",
                     "[HACKERS] hello world",
                     "Re: [HACKERS] hello world",
                     "hola el mundo (was [HACKERS] hello world)",
