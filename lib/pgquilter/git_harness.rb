@@ -11,34 +11,8 @@ module PGQuilter
     end
 
     # Check the location of the master branch of upstream repository
-    def self.check_upstream_sha
-      puts "checking #{::PGQuilter::Config::UPSTREAM_REPO_URL}"
+    def check_upstream_sha
       (run_cmd "git ls-remote #{::PGQuilter::Config::UPSTREAM_REPO_URL} master").split("\t").first
-    end
-
-    def self.run_cmd(cmd)
-      # We ignore stderr for now; we're likely never to need it here
-      # N.B.: this is super-unsafe; don't run with untrusted input
-      result = `#{cmd}`
-      unless $?.exitstatus == 0
-        raise ExecError, "Command `#{cmd}` failed"
-      end
-      result
-    end
-
-    def self.git(subcmd, *opts)
-      FileUtils.cd(::PGQuilter::Config::WORK_DIR) do
-        command = opts.unshift('git', subcmd)
-        Open3.popen(*command) do |stdin, stdout, stderr, wthr|
-          exitstatus = wthr.value.exitstatus
-          unless exitstatus == 0
-            raise ExecError, "Command `#{command}` failed", stderr.readlines
-          end
-          # N.B.: we need this return because FileUtils.cd does
-          # not return the value of the yielded block
-          return stdout.readlines
-        end
-      end
     end
 
     # reset master branch to upstream and return the new location SHA
@@ -73,8 +47,8 @@ module PGQuilter
     end
 
     def git_setup
-      git %W(config --global user.name #{::PGQuilter::Config::QUILTER_NAME})
-      git %W(config --global user.email #{::PGQuilter::Config::QUILTER_EMAIL})
+      git %W(config user.name #{::PGQuilter::Config::QUILTER_NAME})
+      git %W(config user.email #{::PGQuilter::Config::QUILTER_EMAIL})
     end
 
     def git_clone
@@ -101,6 +75,33 @@ module PGQuilter
 
     def git_commit(message, author)
       git %W(commit . -m #{message} --author=#{author})
+    end
+
+    private
+
+    def run_cmd(cmd)
+      # We ignore stderr for now; we're likely never to need it here
+      # N.B.: this is super-unsafe; don't run with untrusted input
+      result = `#{cmd}`
+      unless $?.exitstatus == 0
+        raise ExecError, "Command `#{cmd}` failed"
+      end
+      result
+    end
+
+    def git(args)
+      FileUtils.cd(::PGQuilter::Config::WORK_DIR) do
+        command = [ 'git', *args ]
+        Open3.popen3(*command) do |stdin, stdout, stderr, wthr|
+          exitstatus = wthr.value.exitstatus
+          unless exitstatus == 0
+            raise ExecError, "Command `#{command}` failed", stderr.readlines
+          end
+          # N.B.: we need this return because FileUtils.cd does
+          # not return the value of the yielded block
+          return stdout.read
+        end
+      end
     end
 
   end

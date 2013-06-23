@@ -12,7 +12,10 @@ describe PGQuilter::GitHarness, 'remote tests' do
       Dir.mktmpdir('pg-quilter-test-repo') do |upstream|
         @tmp_upstream_url = "file://#{upstream}"
         system("tar -C #{upstream} -x -z -f spec/repo-template/upstream/dotgit.tgz")
-        example.run
+        Dir.mktmpdir('pg-quilter-workspace') do |workspace|
+          @workspace_dir = "#{workspace}/postgres"
+          example.run
+        end
       end
     end
   end
@@ -23,11 +26,30 @@ describe PGQuilter::GitHarness, 'remote tests' do
     # use this gross hack
     stub_const('PGQuilter::Config::WORK_REPO_URL', @tmp_work_url)
     stub_const('PGQuilter::Config::UPSTREAM_REPO_URL', @tmp_upstream_url)
+    stub_const('PGQuilter::Config::WORK_DIR', @workspace_dir)
   end
 
   it "can check upstream sha" do
     actual_sha = `cd #{@tmp_upstream_url.sub(/\Afile:\/\//, '')} && git rev-parse master`.chomp
-    expect(PGQuilter::GitHarness.check_upstream_sha).to eq(actual_sha)
+    expect(subject.check_upstream_sha).to eq(actual_sha)
   end
 
+  it "can prepare its workspace" do
+    expect(File.directory? ::PGQuilter::Config::WORK_DIR).to be_false
+    subject.prepare_workspace
+    expect(File.directory? ::PGQuilter::Config::WORK_DIR).to be_true
+  end
+
+  context "with workspace" do
+    before(:each) do
+      subject.prepare_workspace
+    end
+
+    it "can reset work repo to upstream" do
+      upstream_sha = `cd #{@tmp_upstream_url.sub(/\Afile:\/\//, '')} && git rev-parse master`.chomp
+      expect(subject.reset).to eq(upstream_sha)
+      work_sha = `cd #{@tmp_upstream_url.sub(/\Afile:\/\//, '')} && git rev-parse master`.chomp
+      expect(work_sha).to eq(upstream_sha)
+    end
+  end
 end
