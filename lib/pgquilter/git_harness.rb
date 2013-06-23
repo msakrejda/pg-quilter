@@ -5,7 +5,7 @@ module PGQuilter
     class ExecError < StandardError
       attr_reader :stderr
       def initialize(msg, stderr)
-        super
+        super(msg)
         @stderr = stderr
       end
     end
@@ -103,7 +103,15 @@ module PGQuilter
         Open3.popen3(*command) do |stdin, stdout, stderr, wthr|
           exitstatus = wthr.value.exitstatus
           unless exitstatus == 0
-            raise ExecError, "Command `#{command}` failed", stderr.readlines
+            stdoutstr = stdout.read
+            stderrstr = stderr.read
+            raise ExecError.new(<<-EOF, stderrstr)
+Command `#{command}` failed
+stdout:
+  #{stdoutstr}
+stderr:
+  #{stderrstr}
+EOF
           end
           # N.B.: we need this return because FileUtils.cd does
           # not return the value of the yielded block

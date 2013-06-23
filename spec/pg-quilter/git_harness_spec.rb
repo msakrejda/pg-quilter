@@ -80,18 +80,17 @@ describe PGQuilter::GitHarness, 'remote tests' do
       expect(workspace_sha).to eq(upstream_sha)
     end
 
-
     it "can prepare a new branch" do
-      branch = 
+      branch = rstr(10)
       subject.prepare_branch(branch)
+      expect(in_workspace("git rev-parse #{branch}")).to eq(in_workspace("git rev-parse master"))
     end
-    def prepare_branch(branch)
-      # N.B.: the git 1.8.1.2 on the Heroku stack image does not support -B
-      git %W(branch #{branch}) rescue nil
-      git %W(checkout #{branch})
-      # TODO: it would be useful to create a commit moving us to master branch
-      # without actually losing commit history
-      git %w(reset --hard master)
+
+    it "can repeat preparation of an existing branch" do
+      branch = rstr(10)
+      subject.prepare_branch(branch)
+      expect { subject.prepare_branch(branch) }.to_not raise_error
+      expect(in_workspace("git rev-parse #{branch}")).to eq(in_workspace("git rev-parse master"))
     end
 
   end
