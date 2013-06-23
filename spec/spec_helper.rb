@@ -3,7 +3,6 @@ ENV['LOG_LEVEL'] = 'WARN'
 
 require './lib/pgquilter'
 require 'rspec'
-#require 'rack/test'
 
 RSpec.configure do |config|
   config.order = 'random'

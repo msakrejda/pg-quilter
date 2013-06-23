@@ -37,4 +37,21 @@ module PGQuilter
     end
 
   end
+
+  class Patchset < Sequel::Model
+    many_to_one :topic
+    one_to_many :patches
+  end
+
+  class Patch < Sequel::Model
+    many_to_one :patchset
+    one_to_many :applications
+  end
+
+  module PGQuilter
+    class Application < Sequel::Model
+      many_to_one :patch
+    end
+  end
+
 end
