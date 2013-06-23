@@ -79,13 +79,15 @@ module PGQuilter
       !result.nil?
     end
 
-    # N.B.: returns application
+    # Applies a patch and returns the resulting Application
     def apply_patch(base_sha, patch)
       result = @g.apply_patch(patch.body)
-      # TODO: properly detect successful patch application
-      failed =~ /does not apply\Z/
+    rescue PatchError => e
+      result = e.message
+      raise
+    ensure
       patch.add_application(base_sha: base_sha,
-                            succeeded: failed.nil?, output: result)
+                            succeeded: success, output: result)
     end
 
   end
