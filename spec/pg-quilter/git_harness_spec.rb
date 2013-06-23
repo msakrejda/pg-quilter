@@ -40,16 +40,38 @@ describe PGQuilter::GitHarness, 'remote tests' do
     expect(File.directory? ::PGQuilter::Config::WORK_DIR).to be_true
   end
 
+  def in_upstream(cmd)
+    `cd #{@tmp_upstream_url.sub(/\Afile:\/\//, '')} && #{cmd}`.chomp
+  end
+
+  def in_work(cmd)
+    `cd #{@tmp_work_url.sub(/\Afile:\/\//, '')} && #{cmd}`.chomp
+  end
+
+  def in_workspace(cmd)
+    `cd #{@workspace_dir} && #{cmd}`.chomp
+  end
+
   context "with workspace" do
     before(:each) do
       subject.prepare_workspace
     end
 
+    it "configures git user metadata correctly" do
+      subject.git_setup
+      user = in_workspace("git config user.name")
+      email = in_workspace("git config user.email")
+
+      expect(user).to eq(PGQuilter::Config::QUILTER_NAME)
+      expect(email).to eq(PGQuilter::Config::QUILTER_EMAIL)
+    end
+
     it "can reset work repo to upstream" do
-      upstream_sha = `cd #{@tmp_upstream_url.sub(/\Afile:\/\//, '')} && git rev-parse master`.chomp
+      upstream_sha = in_upstream("git rev-parse master")
       expect(subject.reset).to eq(upstream_sha)
-      work_sha = `cd #{@tmp_upstream_url.sub(/\Afile:\/\//, '')} && git rev-parse master`.chomp
+      work_sha = in_workspace("git rev-parse master")
       expect(work_sha).to eq(upstream_sha)
     end
+
   end
 end

@@ -15,6 +15,16 @@ module PGQuilter
       (run_cmd "git ls-remote #{::PGQuilter::Config::UPSTREAM_REPO_URL} master").split("\t").first
     end
 
+    def has_workspace?
+      File.directory? ::PGQuilter::Config::WORK_DIR
+    end
+
+    def prepare_workspace
+      ssh_setup
+      git_clone
+      git_setup
+    end
+
     # reset master branch to upstream and return the new location SHA
     def reset
       git %w(checkout master)
@@ -30,16 +40,6 @@ module PGQuilter
       # TODO: it would be useful to create a commit moving us to master branch
       # without actually losing commit history
       git %w(reset --hard master)
-    end
-    
-    def has_workspace?
-      File.directory? ::PGQuilter::Config::WORK_DIR
-    end
-
-    def prepare_workspace
-      ssh_setup
-      git_clone
-      git_setup
     end
 
     def ssh_setup
