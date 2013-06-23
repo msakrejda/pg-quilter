@@ -29,8 +29,9 @@ module PGQuilter
     def self.normalize(subject)
       if subject =~ SUBJECT_WAS_RE
         normalize subject.sub(SUBJECT_WAS_RE, '\1')
+      else
+        subject.gsub(/(?:Re:|\[HACKERS\])\s*/, '').gsub(/\W+/, '-').downcase
       end
-      subject.gsub(/(?:Re:|\[HACKERS\])\s*/, '').gsub(/\W+/, '-').downcase
     end
 
   end
