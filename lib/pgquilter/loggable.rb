@@ -5,7 +5,6 @@ module PGQuilter
       unless @logger
         @logger ||= Logger.new(STDOUT)
         @logger.level = Logger.const_get(PGQuilter::Config::LOG_LEVEL)
-        puts "set logger level to #{@logger.level}"
       end
       @logger
     end
