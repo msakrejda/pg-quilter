@@ -28,6 +28,10 @@ module PGQuilter
       patchset.patches.sort_by(&:patchset_order).take_while do |patch|
         application = apply_patch(base_sha, patch)
         applications << application
+        # Committing regardless of patch application success here is a
+        # little ugly, but it does quickly and obviously break the
+        # Travis build. Perhaps an alternative would be to comment on
+        # the pull request
         commit_msg = commit_message(branch, application)
         @g.git_commit(commit_msg, patchset.author)
         application.succeeded
@@ -59,6 +63,17 @@ EOF
     def ensure_pull_request(topic)
       branch = branch(topic)
       submit_pull_request(branch) unless has_pull_request?(branch)
+    end
+
+    # Has the pull request been closed or merged
+    def pull_request_active?(topic)
+      branch = topic.name
+      prs = @github.pull_requests.with(user: ::PGQuilter::Config::GITHUB_USER,
+                                       repo: 'postgres').list
+      result = prs.find { |pr| pr.title == branch }
+      # This is a degenerate case: a not-yet-opened pull request is
+      # neither closed nor merged
+      result.nil? || result.state == 'open'
     end
 
     private

@@ -137,4 +137,26 @@ EOF
     subject.ensure_pull_request topic
   end
 
+  it "considers an unopened pull request active" do
+    gh_prs.should_receive(:with).with(user: PGQuilter::Config::GITHUB_USER,
+                                      repo: 'postgres')
+      .and_return(double(:prs, list: [ double(:pr, title: "some other pull request") ]))
+    expect(subject.pull_request_active? topic).to eq(true)
+  end
+
+  it "considers an open pull request active" do
+    branch = topic.name
+    gh_prs.should_receive(:with).with(user: PGQuilter::Config::GITHUB_USER,
+                                      repo: 'postgres')
+      .and_return(double(:prs, list: [ double(:pr, title: branch, state: 'open') ]))
+    expect(subject.pull_request_active? topic).to eq(true)
+  end
+
+  it "considers a closed pull request inactive" do
+    branch = topic.name
+    gh_prs.should_receive(:with).with(user: PGQuilter::Config::GITHUB_USER,
+                                      repo: 'postgres')
+      .and_return(double(:prs, list: [ double(:pr, title: branch, state: 'closed') ]))
+    expect(subject.pull_request_active? topic).to eq(false)
+  end
 end
