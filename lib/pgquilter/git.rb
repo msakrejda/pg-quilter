@@ -3,22 +3,23 @@ require 'tempfile'
 module PGQuilter
   class Git
 
-    def initialize(harness)
+    def initialize(harness, github)
       @g = harness
+      @github = github
     end
 
     def check_upstream_sha
       @g.check_upstream_sha
     end
 
-    def branch(patchset)
-      patchset.topic.name
+    def branch(topic)
+      topic.name
     end
 
     # Apply a patchset. Stop applying at first failing patch (but still record it).
     def apply_patchset(patchset)
       check_workspace
-      branch = branch(patchset)
+      branch = branch(patchset.topic)
       base_sha = @g.reset
       @g.prepare_branch branch
 
@@ -33,48 +34,51 @@ module PGQuilter
       end
     end
 
-    def commit_message(branch, applications)
-      # TODO: better commit message, e.g., referencing the actual
-      # patch e-mails (by link or at least ID)
-      "Applying patch set for #{branch}"
+    def commit_message(branch, application)
+      patch = application.patch
+      patchset = patch.patchset
+      n = patch.patchset_order + 1
+      tot = patchset.patches.count
+      msg_id = patchset.message_id
+      <<-EOF
+Applied patch #{n} of #{tot} for #{branch}
+
+For original context, see #{::PGQuilter::Config::HACKERS_ARCHIVE}/#{msg_id}
+EOF
     end
 
-    def push_to_github(patchset)
+    def push_to_github(topic)
       # push both master and the patch so we always have the latest PR
-      @g.update_branch branch(patchset)
+      @g.update_branch branch(topic)
     end
 
     def check_workspace
       @g.prepare_workspace unless @g.has_workspace?
     end
 
-    def ensure_pull_request(patchset)
-      branch = branch(patchset)
+    def ensure_pull_request(topic)
+      branch = branch(topic)
       submit_pull_request(branch) unless has_pull_request?(branch)
+    end
+
+    private
+
+    # True if a pull request already exists for this branch; false otherwise
+    def has_pull_request?(branch)
+      prs = @github.pull_requests.with(user: ::PGQuilter::Config::GITHUB_USER,
+                                       repo: 'postgres').list
+      result = prs.find { |pr| pr.title == branch }
+      !result.nil?
     end
 
     def submit_pull_request(branch)
       # for now, do this only on the first patchset (later, add comments
       # for each subsequent patchset)
-      github.pull_requests.create(PGQuilter::Config::GITHUB_USER, 'postgres',
-                                  { "title" => branch,
-                                    "body" => "",
-                                    "head" => branch,
-                                    "base" => "master" })
-    end
-
-    private
-
-    def github
-      @github ||= Github.new(login: PGQuilter::Config::GITHUB_USER,
-                             password: PGQuilter::Config::GITHUB_PASSWORD)
-    end
-
-    def has_pull_request?(branch)
-      prs = github.pull_requests.with(user: PGQuilter::Config::GITHUB_USER,
-                                      repo: 'postgres').list
-      result = prs.find { |pr| pr.title == branch }
-      !result.nil?
+      @github.pull_requests.create(::PGQuilter::Config::GITHUB_USER, 'postgres',
+                                   { "title" => branch,
+                                     "body" => "",
+                                     "head" => branch,
+                                     "base" => "master" })
     end
 
     # Applies a patch and returns the resulting Application

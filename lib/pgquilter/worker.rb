@@ -26,8 +26,10 @@ module PGQuilter
 
     # Run build for given topic against current git HEAD
     def run_build(topic)
+      github = Github.new(login: PGQuilter::Config::GITHUB_USER,
+                          password: PGQuilter::Config::GITHUB_PASSWORD)
       harness = PGQuilter::GitHarness.new
-      git = PGQuilter::Git.new(harness)
+      git = PGQuilter::Git.new(harness, github)
 
       patchset = topic.patchsets_dataset.order_by(:created_at).last
 
