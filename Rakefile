@@ -1,6 +1,8 @@
 require 'bundler'
 Bundler.setup
 
+require './lib/pgquilter'
+
 namespace :db do
   task :migrate do
     require 'logger'
@@ -13,3 +15,13 @@ namespace :db do
   end
 end
 
+namespace :worker do
+  task :run do
+    github = Github.new(login: PGQuilter::Config::GITHUB_USER,
+                        password: PGQuilter::Config::GITHUB_PASSWORD)
+    harness = PGQuilter::GitHarness.new
+    git = PGQuilter::Git.new(harness, github)
+    worker = PGQuilter::Worker.new(git)
+    worker.run
+  end
+end
