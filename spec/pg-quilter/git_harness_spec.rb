@@ -127,6 +127,26 @@ describe PGQuilter::GitHarness, 'remote tests' do
       expect(in_workspace("git show -p HEAD")).to match(message)
     end
 
-  end
+    it "pushes upstream" do
+      branch = rstr(10)
+      subject.prepare_branch(branch)
+      in_workspace("echo '* logical replication' > TODO")
+      message = 'add TODO list'
+      author  = 'Gladys Vanderhoff <gladys@vanderhoff.net>'
+      subject.git_commit(message, author)
 
+      branch_rev = in_workspace("git rev-parse #{branch}")
+      master_rev = in_workspace("git rev-parse master")
+
+      subject.update_branch(branch)
+
+      # N.B.: here we test the parent, because we expect the most
+      # recent patch to actually be the cherry-pick of the Travis
+      # config (see below)
+      expect(in_work("git rev-parse #{branch}^")).to eq(branch_rev)
+      expect(in_work("git log -1 #{branch} --pretty=format:%s")).to match(/travis/i)
+      expect(in_work("git rev-parse master")).to eq(master_rev)
+    end
+
+  end
 end

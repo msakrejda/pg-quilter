@@ -73,9 +73,10 @@ module PGQuilter
     end
 
     def update_branch(branch)
+      # push both master and the patch so we always have the latest PR
       git %w(push origin master)
       git %w(cherry-pick origin/travis-config)
-      git %w(push -f origin #{branch})
+      git %W(push -f origin #{branch})
     end
 
     # Apply the given patch body to the working directory (does not
