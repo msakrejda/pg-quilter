@@ -26,22 +26,24 @@ module PGQuilter
 
       unless candidates.empty?
         log "Starting builds for #{candidates.count} candidates"
-        candidates.each do |topic|
-          if @git.pull_request_active? topic
-            latest_patchset = topic.patchsets_dataset.order_by(:created_at).last
-            # Avoid rebuilding if the topic build previously failed
-            # and upstream has progressed but there are no new
-            # patchsets: this situation is unlikely to have fixed
-            # anything with the patches
-            unless latest_patchset.last_build_failed?
-              run_build(latest_patchset)
-            end
-          else
-            topic.active = false
-            topic.save
-          end
-        end
+        candidates.each { |topic| check_topic(topic) }
         log "Completed #{candidates.count} builds"
+      end
+    end
+
+    def check_topic(topic)
+      if @git.pull_request_active? topic
+        latest_patchset = topic.latest_patchset
+        # Avoid rebuilding if the topic build previously failed
+        # and upstream has progressed but there are no new
+        # patchsets: this situation is unlikely to have fixed
+        # anything with the patches
+        unless latest_patchset.last_build_failed?
+          run_build(latest_patchset)
+        end
+      else
+        topic.active = false
+        topic.save_changes
       end
     end
 
@@ -55,10 +57,13 @@ module PGQuilter
     end
 
     def run
-      last_sha = nil
+      # N.B.: this may be somewhat inaccurate, as theoretically, we
+      # could have some builds off a newer base_sha. Close enough for
+      # now.
+      last_sha = PGQuilter::Application.last_sha
       loop do
         t0 = Time.now
-        last_sha = check_builds
+        last_sha = check_builds(last_sha)
         t1 = Time.now
         duration = t1 - t0
         if duration < WORKER_FREQUENCY

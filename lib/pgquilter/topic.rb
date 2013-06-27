@@ -23,6 +23,10 @@ module PGQuilter
       end
     end
 
+    def latest_patchset
+      patchsets_dataset.order_by(:created_at).last
+    end
+
     def self.for_subject(subject)
       normalized_subject = self.normalize(subject)
       Topic.find_or_create(name: normalized_subject)
@@ -59,6 +63,11 @@ module PGQuilter
   module PGQuilter
     class Application < Sequel::Model
       many_to_one :patch
+
+      def self.last_sha
+        last_application = order_by(Sequel.desc(:created_at)).last
+        last_application && last_application.base_sha
+      end
     end
   end
 
