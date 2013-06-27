@@ -6,19 +6,21 @@ module PGQuilter
 
     SUBJECT_WAS_RE = /.*[\(\[]\s*was:?\s*([^\)]+)\s*[\)\]]/
 
-    def self.active
-      self.where(active: true)
-    end
+    dataset_module do
+      def active
+        where(active: true)
+      end
 
-    def self.without_build(for_sha)
-      self.distinct(:topics__uuid)
-        .inner_join(:patchsets, topic_id: :topics__uuid)
-        .inner_join(:patches, patchset_id: :patchsets__uuid)
-        .inner_join(:applications, patch_id: :patches__uuid)
-        .where(active: true)
-        .order(:topics__uuid, :patchsets__created_at,
-               Sequel.desc(:patches__patchset_order),
-               Sequel.desc(:applications__created_at))
+      def without_build(for_sha)
+        distinct(:topics__uuid)
+          .inner_join(:patchsets, topic_id: :topics__uuid)
+          .inner_join(:patches, patchset_id: :patchsets__uuid)
+          .inner_join(:applications, patch_id: :patches__uuid)
+          .where(active: true)
+          .order(:topics__uuid, :patchsets__created_at,
+                 Sequel.desc(:patches__patchset_order),
+                 Sequel.desc(:applications__created_at))
+      end
     end
 
     def self.for_subject(subject)
@@ -35,12 +37,18 @@ module PGQuilter
           .gsub(/\W+/, '-').downcase
       end
     end
-
   end
 
   class Patchset < Sequel::Model
     many_to_one :topic
     one_to_many :patches
+
+    def last_build_failed?
+      patches.any? do |patch|
+        last_application = patch.applications.order_by(:created_at).last
+        last_application && !last_application.succeeded
+      end
+    end
   end
 
   class Patch < Sequel::Model
