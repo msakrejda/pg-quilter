@@ -49,7 +49,7 @@ module PGQuilter
 
     def last_build_failed?
       patches.any? do |patch|
-        last_application = patch.applications.order_by(:created_at).last
+        last_application = patch.applications_dataset.order_by(:created_at).last
         last_application && !last_application.succeeded
       end
     end
