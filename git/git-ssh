@@ -1,3 +1,6 @@
 #!/bin/bash
 
-ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i <(echo $GITHUB_PRIVATE_KEY) "$@"
+keyfile=$(mktemp)
+echo "$GITHUB_PRIVATE_KEY" > $keyfile
+
+ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i $keyfile "$@"
