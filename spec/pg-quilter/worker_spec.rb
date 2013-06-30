@@ -35,7 +35,7 @@ describe PGQuilter::GitHarness do
   it "builds topics with active pull requests" do
     git.should_receive(:pull_request_active?).with(topic).and_return(true)
     latest_patchset.should_receive(:last_build_failed?).and_return(false)
-    subject.should_receive(:run_build).with(latest_patchset)
+    subject.should_receive(:run_build).with(topic)
 
     subject.check_topic(topic)
   end

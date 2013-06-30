@@ -39,7 +39,7 @@ module PGQuilter
         # patchsets: this situation is unlikely to have fixed
         # anything with the patches
         unless latest_patchset.last_build_failed?
-          run_build(latest_patchset)
+          run_build(topic)
         end
       else
         topic.active = false
@@ -48,9 +48,9 @@ module PGQuilter
     end
 
     # Run build for given patchset against current git HEAD
-    def run_build(patchset)
-      @git.apply_patchset(patchset)
-      @git.ensure_pull_request(patchset.topic)
+    def run_build(topic)
+      @git.apply_patchset(topic.latest_patchset)
+      @git.ensure_pull_request(topic)
     rescue StandardError => e
       log "Could not complete build: #{e.message}"
       raise
