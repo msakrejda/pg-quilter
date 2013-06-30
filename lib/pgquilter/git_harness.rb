@@ -24,7 +24,6 @@ module PGQuilter
     # Prepare a workspace: configure ssh keys and set up the local git
     # repository and relevant remotes
     def prepare_workspace
-      ssh_setup
       git_clone
       git_setup
     end
@@ -50,15 +49,6 @@ module PGQuilter
       # TODO: it would be useful to create a commit moving us to master branch
       # without actually losing commit history
       git %w(reset --hard master)
-    end
-
-    # Set up ssh keys for git command
-    def ssh_setup
-      if ENV.has_key? 'GITHUB_PRIVATE_KEY'
-        # TODO: we skip this when the key is not set for testing;
-        # figure out a better approach
-        run_cmd 'echo "$GITHUB_PRIVATE_KEY" > $HOME/.ssh/id_rsa'
-      end
     end
 
     def git_setup
@@ -113,7 +103,8 @@ module PGQuilter
     def git(args)
       FileUtils.cd(::PGQuilter::Config::WORK_DIR) do
         command = [ 'git', *args ]
-        Open3.popen3(*command) do |stdin, stdout, stderr, wthr|
+        Open3.popen3({ 'GIT_SSH' => '/app/git/git-ssh' },
+                     *command) do |stdin, stdout, stderr, wthr|
           exitstatus = wthr.value.exitstatus
           unless exitstatus == 0
             stdoutstr = stdout.read
