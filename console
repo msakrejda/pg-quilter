@@ -1,0 +1,21 @@
+#!/usr/bin/env ruby
+require 'bundler'
+Bundler.setup
+require 'pry'
+require './lib/pgquilter'
+
+include PGQuilter
+
+Sequel::Model.db.loggers << Logger.new($stdout)
+
+Pry.prompt = [
+   proc { |target_self, nest_level, pry|
+     "[#{pry.input_array.size}] (#{Pry.view_clip(target_self)})#{":#{nest_level}" unless nest_level.zero?}> "
+   },
+
+   proc { |target_self, nest_level, pry|
+     "[#{pry.input_array.size}] (#{Pry.view_clip(target_self)})#{":#{nest_level}" unless nest_level.zero?}* "
+   }
+  ]
+
+Pry.start
