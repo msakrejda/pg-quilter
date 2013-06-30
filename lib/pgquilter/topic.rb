@@ -60,14 +60,12 @@ module PGQuilter
     one_to_many :applications
   end
 
-  module PGQuilter
-    class Application < Sequel::Model
-      many_to_one :patch
+  class Application < Sequel::Model
+    many_to_one :patch
 
-      def self.last_sha
-        last_application = order_by(Sequel.desc(:created_at)).last
-        last_application && last_application.base_sha
-      end
+    def self.last_sha
+      last_application = order_by(Sequel.desc(:created_at)).last
+      last_application && last_application.base_sha
     end
   end
 
