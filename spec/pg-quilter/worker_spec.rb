@@ -58,4 +58,11 @@ describe PGQuilter::GitHarness do
     subject.check_topic(topic)
   end
 
+  it "runs builds" do
+    git.should_receive(:apply_patchset).with(topic.latest_patchset)
+    git.should_receive(:push_to_github).with(topic)
+    git.should_receive(:ensure_pull_request).with(topic)
+
+    subject.run_build(topic)
+  end
 end

@@ -50,6 +50,7 @@ module PGQuilter
     # Run build for given patchset against current git HEAD
     def run_build(topic)
       @git.apply_patchset(topic.latest_patchset)
+      @git.push_to_github(topic)
       @git.ensure_pull_request(topic)
     rescue StandardError => e
       log "Could not complete build: #{e.message}"
