@@ -51,6 +51,8 @@ problems caused are likely minimal, but please keep this in mind.
 
 ## Heroku Setup
 
+`pg-quilter` is fairly easy to set up on Heroku:
+
 ```console
 $ git clone git@github.com:deafbybeheading/pg-quilter.git
 $ cd pg-quilter
@@ -65,6 +67,9 @@ be a separate account with a separate ssh key:
 $ heroku config:set GITHUB_PRIVATE_KEY=<(cat /path/to/key/id_rsa)
 $ heroku config:set GITHUB_PASSWORD=...
 ```
+
+Make sure that the corresponding public key has been [uploaded to
+GitHub](https://github.com/settings/ssh).
 
 Then add the necessary addons and deploy:
 
