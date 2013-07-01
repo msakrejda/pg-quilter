@@ -10,6 +10,7 @@ describe PGQuilter::Topic, '#normalize' do
                     "hello world!",
                     "[HACKERS] hello world",
                     "Re: [HACKERS] hello world",
+                    "Fwd: [HACKERS] hello world",
                     "hola el mundo (was [HACKERS] hello world)",
                     "hola el mundo (was: [HACKERS] hello world)",
                     "hola el mundo [was [HACKERS] hello world]",

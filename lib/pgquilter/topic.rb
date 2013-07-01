@@ -36,7 +36,7 @@ module PGQuilter
       if subject =~ SUBJECT_WAS_RE
         normalize subject.sub(SUBJECT_WAS_RE, '\1')
       else
-        subject.gsub(/(?:Re:|\[HACKERS\])\s*/, '')
+        subject.gsub(/(?:Re:|Fwd:|\[HACKERS\])\s*/, '')
           .gsub(/(?:\A\W+|\W+\Z)/, '')
           .gsub(/\W+/, '-').downcase
       end
