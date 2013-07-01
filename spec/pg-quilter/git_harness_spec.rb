@@ -99,6 +99,10 @@ describe PGQuilter::GitHarness, 'remote tests' do
       subject.prepare_branch(branch)
 
       expect { subject.apply_patch(patch) }.to_not raise_error
+
+      expect(File.exists? File.join(PGQuilter::Config::WORK_DIR,
+                                    PGQuilter::Config::BAD_PATCH_SENTINEL)).to be_false
+
       # N.B.: we chomp in the helper command, so we need to do it to the patch
       expect(in_workspace("git add . && git diff master")).to eq(patch.chomp)
     end
@@ -113,6 +117,8 @@ describe PGQuilter::GitHarness, 'remote tests' do
         expect(e.class).to eq(PGQuilter::GitHarness::PatchError)
         expect(e.message =~ /patch does not apply/)
       end
+      expect(File.exists? File.join(PGQuilter::Config::WORK_DIR,
+                                    PGQuilter::Config::BAD_PATCH_SENTINEL)).to be_true
       # N.B.: we chomp in the helper command, so we need to do it to the patch
       expect(in_workspace("git rev-parse #{branch}")).to eq(in_workspace("git rev-parse master"))
     end
