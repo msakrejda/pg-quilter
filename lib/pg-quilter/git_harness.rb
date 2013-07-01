@@ -4,7 +4,7 @@ module PGQuilter
   class GitHarness
     class ExecError < StandardError
       attr_reader :stderr
-      def initialize(msg, stderr)
+      def initialize(msg, stderr=nil)
         super(msg)
         @stderr = stderr
       end
