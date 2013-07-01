@@ -1,8 +1,9 @@
 # pg-quilter
 
 `pg-quilter` is a continuous integration tool to help streamline the
-Postgres patch review process. Most of this process takes place can be
-tracked via the [CommitFest
+Postgres patch review process.
+
+Most of this process takes place can be tracked via the [CommitFest
 manager](https://commitfest.postgresql.org/), but this still leaves
 some manual work: the actual code review, checking whether the patch
 (still) applies, testing whether it passes the `make check` test
