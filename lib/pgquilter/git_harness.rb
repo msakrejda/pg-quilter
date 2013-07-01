@@ -79,7 +79,8 @@ module PGQuilter
       end
     rescue ->(e) { e.respond_to?(:stderr) && e.stderr =~ /patch does not apply/ } => e
       # TODO: do better than the above heuristic
-      sentinel_path = File.join(WORK_DIR, ::PGQuilter::Config::BAD_PATCH_SENTINEL)
+      sentinel_path = File.join(::PGQuilter::Config::WORK_DIR,
+                                ::PGQuilter::Config::BAD_PATCH_SENTINEL)
       FileUtils.touch(sentinel_path)
       raise PatchError, e.stderr
     end
