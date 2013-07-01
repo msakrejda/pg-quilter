@@ -65,7 +65,7 @@ module PGQuilter
     def update_branch(branch)
       # push both master and the patch so we always have the latest PR
       git %w(push origin master)
-      git %w(cherry-pick origin/travis-config)
+      add_travis
       git %W(push -f origin #{branch})
     end
 
@@ -79,6 +79,8 @@ module PGQuilter
       end
     rescue ->(e) { e.respond_to?(:stderr) && e.stderr =~ /patch does not apply/ } => e
       # TODO: do better than the above heuristic
+      sentinel_path = File.join(WORK_DIR, ::PGQuilter::Config::BAD_PATCH_SENTINEL)
+      FileUtils.touch(sentinel_path)
       raise PatchError, e.stderr
     end
 
@@ -124,5 +126,19 @@ EOF
       end
     end
 
+    def add_travis
+      travis_yml_path = File.join(::PGQuilter::Config::WORK_DIR, '.travis.yml')
+      File.open(travis_yml_path, 'w') do |f|
+        f.write <<-EOF
+language: c
+compiler:
+  - gcc
+  - clang
+
+script: test ! -f #{::PGQuilter::Config::BAD_PATCH_SENTINEL} && ./configure && make check
+EOF
+      end
+      git_commit("Adding travis.yml", '#{::PGQuilter::Config::QUILTER_NAME} <#{::PGQuilter::Config::QUILTER_EMAIL}>')
+    end
   end
 end

@@ -141,8 +141,8 @@ describe PGQuilter::GitHarness, 'remote tests' do
       subject.update_branch(branch)
 
       # N.B.: here we test the parent, because we expect the most
-      # recent patch to actually be the cherry-pick of the Travis
-      # config (see below)
+      # recent patch to actually be the addition of the Travis config
+      # (see below)
       expect(in_work("git rev-parse #{branch}^")).to eq(branch_rev)
       expect(in_work("git log -1 #{branch} --pretty=format:%s")).to match(/travis/i)
       expect(in_work("git rev-parse master")).to eq(master_rev)
