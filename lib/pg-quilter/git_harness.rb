@@ -13,7 +13,7 @@ module PGQuilter
 
     # Check the location of the master branch of upstream repository
     def check_upstream_sha
-      (run_cmd "git ls-remote #{::PGQuilter::Config::UPSTREAM_REPO_URL} master").split("\t").first
+      git(%W(ls-remote #{::PGQuilter::Config::UPSTREAM_REPO_URL} master)).split("\t").first
     end
 
     # True if a workspace has been prepared; false otherwise
@@ -34,7 +34,7 @@ module PGQuilter
       git %w(checkout master)
       git %w(fetch upstream)
       git %w(reset --hard upstream/master)
-      (git %w(show-ref -s refs/heads/master)).chomp
+      git(%w(show-ref -s refs/heads/master)).chomp
     end
 
     # Create given branch if necessary and reset it to master
@@ -108,26 +108,34 @@ module PGQuilter
     end
 
     def git(args)
-      FileUtils.cd(::PGQuilter::Config::WORK_DIR) do
-        command = [ 'git', *args ]
-        Open3.popen3({ 'GIT_SSH' => '/app/git/git-ssh' },
-                     *command) do |stdin, stdout, stderr, wthr|
-          exitstatus = wthr.value.exitstatus
-          unless exitstatus == 0
-            stdoutstr = stdout.read
-            stderrstr = stderr.read
-            raise ExecError.new(<<-EOF, stderrstr)
+      if File.directory? ::PGQuilter::Config::WORK_DIR
+        FileUtils.cd(::PGQuilter::Config::WORK_DIR) do
+          # N.B.: we need this return because FileUtils.cd does
+          # not return the value of the yielded block
+          return direct_git(args)
+        end
+      else
+        direct_git(args)
+      end
+    end
+
+    def direct_git(args)
+      command = [ 'git', *args ]
+      Open3.popen3({ 'GIT_SSH' => '/app/git/git-ssh' },
+                   *command) do |stdin, stdout, stderr, wthr|
+        exitstatus = wthr.value.exitstatus
+        unless exitstatus == 0
+          stdoutstr = stdout.read
+          stderrstr = stderr.read
+          raise ExecError.new(<<-EOF, stderrstr)
 Command `#{command}` failed
 stdout:
   #{stdoutstr}
 stderr:
   #{stderrstr}
 EOF
-          end
-          # N.B.: we need this return because FileUtils.cd does
-          # not return the value of the yielded block
-          return stdout.read
         end
+        stdout.read
       end
     end
 
