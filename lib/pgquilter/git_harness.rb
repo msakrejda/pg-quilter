@@ -86,9 +86,13 @@ module PGQuilter
     end
 
     # Commit all local changes (including new files)
-    def git_commit(message, author)
+    def git_commit(message, author=nil)
       git %W(add .)
-      git %W(commit -m #{message} --author=#{author})
+      commit_args = %W(commit -m #{message})
+      unless author.nil?
+        commit_args << "--author=#{author}"
+      end
+      git commit_args
     end
 
     private
@@ -139,7 +143,7 @@ compiler:
 script: test ! -f #{::PGQuilter::Config::BAD_PATCH_SENTINEL} && ./configure && make check
 EOF
       end
-      git_commit("Adding travis.yml", '#{::PGQuilter::Config::QUILTER_NAME} <#{::PGQuilter::Config::QUILTER_EMAIL}>')
+      git_commit("Adding travis.yml")
     end
   end
 end
