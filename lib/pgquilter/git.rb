@@ -100,13 +100,15 @@ EOF
     def apply_patch(base_sha, patch)
       result = @g.apply_patch(patch.body)
       success = true
-    rescue PatchError => e
+    rescue PGQuilter::GitHarness::PatchError => e
       result = e.message
       success = false
     ensure
-      application = patch.add_application(base_sha: base_sha,
-                                          succeeded: success, output: result)
-      return application
+      unless success.nil?
+        application = patch.add_application(base_sha: base_sha,
+                                            succeeded: success, output: result)
+        return application
+      end
     end
   end
 end
