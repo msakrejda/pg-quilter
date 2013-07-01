@@ -17,7 +17,9 @@ list, watches for patches, attempts to apply them against the latest
 Postgres master branch, and submits a GitHub pull request for the
 change to its own fork of the Postgres repository. It configures these
 requests for builds by [Travis CI](https://travis-ci.org/), and Travis
-then indicates whether or not a run of `make check` succeeded.
+then indicates whether or not a run of `make check` succeeded. It also
+updates the pull requests when changes are committed upstream in
+Postgres to ensure that the patch always applies against current code.
 
 The Travis state of a pull request will indicate whether or not a
 patch applied successfully (`pg-quilter` creates a sentinel file when
