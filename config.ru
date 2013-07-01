@@ -1,6 +1,6 @@
 $stdout.sync = $stderr.sync = true
 
-require './lib/pgquilter'
+require './lib/pg-quilter'
 
 use Rack::CommonLogger
 
