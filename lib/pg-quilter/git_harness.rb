@@ -57,7 +57,7 @@ module PGQuilter
     end
 
     def git_clone
-      run_cmd "mkdir -p #{::PGQuilter::Config::WORK_DIR}"
+      FileUtils.mkdir_p(::PGQuilter::Config::WORK_DIR)
       git %W(clone #{::PGQuilter::Config::WORK_REPO_URL} #{::PGQuilter::Config::WORK_DIR})
       git %W(remote add upstream #{::PGQuilter::Config::UPSTREAM_REPO_URL})
     end
@@ -96,16 +96,6 @@ module PGQuilter
     end
 
     private
-
-    def run_cmd(cmd)
-      # We ignore stderr for now; we're likely never to need it here
-      # N.B.: this is super-unsafe; don't run with untrusted input
-      result = `#{cmd}`
-      unless $?.exitstatus == 0
-        raise ExecError, "Command `#{cmd}` failed"
-      end
-      result
-    end
 
     def git(args)
       if File.directory? ::PGQuilter::Config::WORK_DIR
