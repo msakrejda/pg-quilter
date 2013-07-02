@@ -111,8 +111,8 @@ EOF
       success = false
     ensure
       unless success.nil?
-        patch.add_application(base_sha: base_sha,
-                              succeeded: success, output: result)
+        return patch.add_application(base_sha: base_sha,
+                                     succeeded: success, output: result)
       end
     end
   end
