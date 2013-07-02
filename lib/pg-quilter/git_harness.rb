@@ -11,6 +11,8 @@ module PGQuilter
     end
     class PatchError < StandardError; end
 
+    FAILED_APPLY_RE = /patch does not apply|fatal: git apply: bad git-diff|fatal: unrecognized input/
+
     # Check the location of the master branch of upstream repository
     def check_upstream_sha
       git(%W(ls-remote #{::PGQuilter::Config::UPSTREAM_REPO_URL} master)).split("\t").first
@@ -77,7 +79,7 @@ module PGQuilter
         f.flush
         git %W(apply --verbose #{f.path})
       end
-    rescue ->(e) { e.respond_to?(:stderr) && e.stderr =~ /patch does not apply/ } => e
+    rescue ->(e) { e.respond_to?(:stderr) && e.stderr =~ FAILED_APPLY_RE } => e
       # TODO: do better than the above heuristic
       sentinel_path = File.join(::PGQuilter::Config::WORK_DIR,
                                 ::PGQuilter::Config::BAD_PATCH_SENTINEL)
