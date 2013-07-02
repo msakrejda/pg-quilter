@@ -16,7 +16,6 @@ module PGQuilter
           .inner_join(:patchsets, topic_id: :topics__uuid)
           .inner_join(:patches, patchset_id: :patchsets__uuid)
           .left_join(:applications, patch_id: :patches__uuid)
-          .where(active: true)
           .order(:topics__uuid, :patchsets__created_at,
                  Sequel.desc(:patches__patchset_order),
                  Sequel.desc(:applications__created_at))
