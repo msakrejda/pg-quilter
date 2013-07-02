@@ -64,7 +64,7 @@ to allow it to run push to its repo, and an account password. This should
 be a separate account with a separate ssh key:
 
 ```console
-$ heroku config:set GITHUB_PRIVATE_KEY=<(cat /path/to/key/id_rsa)
+$ heroku config:set GITHUB_PRIVATE_KEY="$(cat /path/to/key/id_rsa)"
 $ heroku config:set GITHUB_PASSWORD=...
 ```
 
