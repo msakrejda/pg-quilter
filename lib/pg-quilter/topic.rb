@@ -13,6 +13,7 @@ module PGQuilter
 
       def without_build(for_sha)
         distinct(:topics__uuid)
+          .select(:topics.*)
           .inner_join(:patchsets, topic_id: :topics__uuid)
           .inner_join(:patches, patchset_id: :patchsets__uuid)
           .left_join(:applications, patch_id: :patches__uuid)
