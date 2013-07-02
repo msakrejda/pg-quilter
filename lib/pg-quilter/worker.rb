@@ -22,7 +22,7 @@ module PGQuilter
       # mande in the meantime. That's fine--the underlying
       # infrastructure records the correct SHA, and this only gives us
       # an indication of whether we need to rebuild at all.
-      candidates = Topic.active.without_build(for_sha)
+      candidates = Topic.active.without_build(for_sha).all
 
       unless candidates.empty?
         log "Starting builds for #{candidates.count} candidates"
