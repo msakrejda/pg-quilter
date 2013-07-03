@@ -45,9 +45,9 @@ module PGQuilter
       tot = patchset.patches.count
       msg_id = patchset.message_id
       <<-EOF
-Applied patch #{n} of #{tot} for #{branch}
+#{branch} (patch #{n} of #{tot})
 
-'git apply --verbose' output was:
+'git apply --summary --stat --apply --verbose' output was:
 
 #{application.output}
 
