@@ -47,11 +47,9 @@ module PGQuilter
       <<-EOF
 Applied patch #{n} of #{tot} for #{branch}
 
-`git apply --verbose` output was:
+'git apply --verbose' output was:
 
-```
 #{application.output}
-```
 
 For original context, see #{::PGQuilter::Config::HACKERS_ARCHIVE}/#{msg_id}
 EOF
