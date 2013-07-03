@@ -75,7 +75,7 @@ module PGQuilter
       Tempfile.open('pg-quilter-postgres', '/tmp') do |f|
         f.write patch_body
         f.flush
-        git %W(apply --verbose #{f.path})
+        git %W(apply --summary --stat --apply --verbose #{f.path})
       end
     rescue ExecError => e
       sentinel_path = File.join(::PGQuilter::Config::WORK_DIR,
