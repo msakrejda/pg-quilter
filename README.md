@@ -33,7 +33,9 @@ whether it passes `make check`.
 `pg-quilter` is currently running on Heroku and using the
 [pg-quilter/postgres](https://github.com/pg-quilter/postgres) GitHub
 repo. For currently open requests, see the [pull
-requests](https://github.com/pg-quilter/postgres/pulls) page.
+requests](https://github.com/pg-quilter/postgres/pulls) page and the
+Travis CI [pull request build
+page](https://travis-ci.org/pg-quilter/postgres/pull_requests).
 
 N.B.: It's relatively easy to spoof mail to `pg-quilter` right
 now. The patches are an out-of-band feedback mechanism and the
