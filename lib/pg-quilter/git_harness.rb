@@ -31,6 +31,7 @@ module PGQuilter
     # Update upstream, reset master branch to latest upstream change,
     # and return the new HEAD sha
     def reset
+      git %w(clean -f -d)
       git %w(checkout master)
       git %w(fetch upstream)
       git %w(reset --hard upstream/master)
