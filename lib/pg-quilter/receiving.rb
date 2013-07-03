@@ -29,12 +29,14 @@ module PGQuilter
       patchset = topic.add_patchset(author: author, message_id: message_id)
 
       begin
+        patch_no = 0
         message['attachments'].sort_by { |k, v| k.to_i }.select do |k, attachment|
           is_patch?(attachment)
         end.each do |k, attachment|
           filename = attachment[:filename]
           content = get_patch_content(attachment)
-          patchset.add_patch(patchset_order: k.to_i, filename: filename, body: content)
+          patchset.add_patch(patchset_order: patch_no, filename: filename, body: content)
+          patch_no += 1
         end
       rescue StandardError => e
         Failure.create(message_id: message_id, error: e.message)
