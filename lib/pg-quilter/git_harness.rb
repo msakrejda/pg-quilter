@@ -138,7 +138,7 @@ compiler:
   - gcc
   - clang
 
-script: test ! -f #{::PGQuilter::Config::BAD_PATCH_SENTINEL} && ./configure && make check
+script: test ! -f #{::PGQuilter::Config::BAD_PATCH_SENTINEL} && ./configure --with-libxml --with-openssl --enable-cassert && make check
 EOF
       end
       git_commit("Adding travis.yml")
