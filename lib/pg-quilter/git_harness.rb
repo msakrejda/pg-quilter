@@ -137,6 +137,8 @@ language: c
 compiler:
   - gcc
   - clang
+notifications:
+  email: false
 
 script: test ! -f #{::PGQuilter::Config::BAD_PATCH_SENTINEL} && ./configure --with-libxml --with-openssl --enable-cassert && make check
 EOF
