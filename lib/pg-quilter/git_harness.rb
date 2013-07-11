@@ -140,6 +140,8 @@ compiler:
 notifications:
   email: false
 
+before_script: echo "COPT=-Werror" > Makefile.custom
+
 script: test ! -f #{::PGQuilter::Config::BAD_PATCH_SENTINEL} && ./configure --with-libxml --with-openssl --enable-cassert && make check
 EOF
       end
