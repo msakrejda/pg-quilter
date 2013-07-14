@@ -55,6 +55,10 @@ error: patch failed: test:1
 error: test: patch does not apply
 EOF
 
+  def pr_head(branch)
+    "#{PGQuilter::Config::GITHUB_USER}:#{branch}"
+  end
+
   before(:each) do
     good_patch.stub(:patchset).and_return(good_patchset)
     bad_patch.stub(:patchset).and_return(bad_patchset)
@@ -117,9 +121,9 @@ EOF
 
   it "creates a pull request if necessary" do
     branch = topic.name
-    gh_prs.should_receive(:with).with(user: PGQuilter::Config::GITHUB_USER,
-                                      repo: 'postgres')
-      .and_return(double(:prs, list: [ double(:pr, title: "some other pull request") ]))
+    gh_prs.should_receive(:list).with(user: PGQuilter::Config::GITHUB_USER,
+                                      repo: 'postgres', head: pr_head(branch))
+      .and_return([])
     gh_prs.should_receive(:create).with(PGQuilter::Config::GITHUB_USER, 'postgres',
                                         { "title" => branch,
                                           "body" => "",
@@ -130,33 +134,33 @@ EOF
 
   it "does not create a pull request if one exists" do
     branch = topic.name
-    gh_prs.should_receive(:with).with(user: PGQuilter::Config::GITHUB_USER,
-                                      repo: 'postgres')
-      .and_return(double(:prs, list: [ double(:pr, title: branch) ]))
-
+    gh_prs.should_receive(:list).with(user: PGQuilter::Config::GITHUB_USER,
+                                      repo: 'postgres', head: pr_head(branch))
+      .and_return([ double(:pr, title: branch) ])
     subject.ensure_pull_request topic
   end
 
   it "considers an unopened pull request active" do
-    gh_prs.should_receive(:with).with(user: PGQuilter::Config::GITHUB_USER,
-                                      repo: 'postgres')
-      .and_return(double(:prs, list: [ double(:pr, title: "some other pull request") ]))
+    branch = topic.name
+    gh_prs.should_receive(:list).with(user: PGQuilter::Config::GITHUB_USER,
+                                      repo: 'postgres', head: pr_head(branch))
+      .and_return([])
     expect(subject.pull_request_active? topic).to eq(true)
   end
 
   it "considers an open pull request active" do
     branch = topic.name
-    gh_prs.should_receive(:with).with(user: PGQuilter::Config::GITHUB_USER,
-                                      repo: 'postgres')
-      .and_return(double(:prs, list: [ double(:pr, title: branch, state: 'open') ]))
+    gh_prs.should_receive(:list).with(user: PGQuilter::Config::GITHUB_USER,
+                                      repo: 'postgres', head: pr_head(branch))
+      .and_return([ double(:pr, title: branch, state: 'open') ])
     expect(subject.pull_request_active? topic).to eq(true)
   end
 
   it "considers a closed pull request inactive" do
     branch = topic.name
-    gh_prs.should_receive(:with).with(user: PGQuilter::Config::GITHUB_USER,
-                                      repo: 'postgres')
-      .and_return(double(:prs, list: [ double(:pr, title: branch, state: 'closed') ]))
+    gh_prs.should_receive(:list).with(user: PGQuilter::Config::GITHUB_USER,
+                                      repo: 'postgres', head: pr_head(branch))
+      .and_return([ double(:pr, title: branch, state: 'closed') ])
     expect(subject.pull_request_active? topic).to eq(false)
   end
 end

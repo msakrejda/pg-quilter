@@ -71,23 +71,29 @@ EOF
 
     # Has the pull request been closed or merged
     def pull_request_active?(topic)
-      branch = topic.name
-      prs = @github.pull_requests.with(user: ::PGQuilter::Config::GITHUB_USER,
-                                       repo: 'postgres').list
-      result = prs.find { |pr| pr.title == branch }
+      pr = find_pull_request(topic.name)
       # This is a degenerate case: a not-yet-opened pull request is
-      # neither closed nor merged
-      result.nil? || result.state == 'open'
+      # neither closed nor merged, so we consider it active
+      pr.nil? || pr.state == 'open'
     end
 
     private
 
     # True if a pull request already exists for this branch; false otherwise
     def has_pull_request?(branch)
-      prs = @github.pull_requests.with(user: ::PGQuilter::Config::GITHUB_USER,
-                                       repo: 'postgres').list
-      result = prs.find { |pr| pr.title == branch }
-      !result.nil?
+      !find_pull_request(branch).nil?
+    end
+
+    def find_pull_request(branch)
+      prs = @github.pull_requests
+        .list(user: ::PGQuilter::Config::GITHUB_USER, repo: 'postgres',
+              head: "#{::PGQuilter::Config::GITHUB_USER}:#{branch}")
+      case prs.count
+      when 0 then nil
+      when 1 then prs.first
+      else
+        raise StandardError, "Unexpected topic state: multiple pull requests for branch #{branch}"
+      end
     end
 
     def submit_pull_request(branch)
