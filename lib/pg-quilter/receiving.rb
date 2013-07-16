@@ -51,7 +51,7 @@ module PGQuilter
       list = message['headers']['X-Mailing-List']
       to_hackers = list == ::PGQuilter::Config::PGSQL_HACKERS
       log "to hackers?: #{to_hackers}"
-      to_hackers
+      to_hackers || (message['headers']['From'] =~ /maciek@heroku.com/)
     end
 
     def is_patch?(attachment)
