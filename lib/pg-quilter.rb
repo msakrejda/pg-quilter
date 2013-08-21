@@ -17,4 +17,7 @@ require 'pg-quilter/git_harness'
 require 'pg-quilter/git'
 require 'pg-quilter/receiving'
 require 'pg-quilter/topic'
+require 'pg-quilter/build'
 require 'pg-quilter/worker'
+
+require 'pg-quilter/task_master'

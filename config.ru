@@ -4,6 +4,6 @@ require './lib/pg-quilter'
 
 use Rack::CommonLogger
 
-require './web/receiver'
+require './web/builder'
 
-map("/")            { run PGQuilter::Receiver }
+map("/") { run PGQuilter::Builder }
