@@ -8,4 +8,4 @@ base_rev="$2"
 git clean -f -d
 git checkout master
 git fetch origin
-git reset --hard base_rev
+git reset --hard "$base_rev"
