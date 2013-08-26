@@ -46,7 +46,7 @@ module PGQuilter
         base_rev = "origin/#{base_rev}"
       end
       in_dir workdir do
-        run %W(bin/pg-reset-workspace #{workdir} #{base_rev})
+        run %W(/app/bin/pg-reset-workspace #{workdir} #{base_rev})
       end
     end
 
