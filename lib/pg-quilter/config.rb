@@ -11,7 +11,8 @@ module PGQuilter
     PGSQL_HACKERS = 'pgsql-hackers'
     HACKERS_ARCHIVE = 'http://www.postgresql.org/message-id'
 
-    WORK_DIR = '/tmp/postgres'
+    # N.B.: this must be something that is accessible when fakesu-ing
+    WORK_DIR = '/app/postgres'
     BAD_PATCH_SENTINEL = '.pg-quilter-patch-application-failed.sentinel'
     WORK_REPO_URL = 'git@github.com:pg-quilter/postgres.git'
     UPSTREAM_REPO_URL = 'git@github.com:postgres/postgres.git'
