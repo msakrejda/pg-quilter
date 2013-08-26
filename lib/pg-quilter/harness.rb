@@ -61,7 +61,7 @@ module PGQuilter
     end
 
     def configure
-      run %W(fakesu -c /app/bin/pg-config #{workdir})
+      run %W(fakesu -c /app/bin/pg-configure #{workdir})
     end
 
     def make
