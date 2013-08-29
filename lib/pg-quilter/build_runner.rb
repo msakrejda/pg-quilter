@@ -30,13 +30,13 @@ module PGQuilter
       step "make" do
         harness.make
       end
-      step "make_contrib" do
+      step "make contrib" do
         harness.make_contrib
       end
-      step "make_check" do
+      step "make check" do
         harness.make_check
       end
-      step "make_contribcheck" do
+      step "make contribcheck" do
         harness.make_contribcheck
       end
     rescue BuildError => e
