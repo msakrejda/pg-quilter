@@ -57,7 +57,7 @@ class PGQuilter::Builder < Sinatra::Base
 
   def format_build(b)
     {
-      id: uuid,
+      id: b.uuid,
       created_at: b.created_at,
       patches: b.patches.sort_by(&:order).map { |p| format_patch(p) },
     }.to_json
