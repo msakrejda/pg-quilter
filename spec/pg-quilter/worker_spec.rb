@@ -1,7 +1,7 @@
 require 'tempfile'
 require 'spec_helper'
 
-describe PGQuilter::GitHarness do
+describe PGQuilter::Worker do
 
   let(:latest_patchset) { double(:latest_patchset) }
   let(:topic) { double(:topic, latest_patchset: latest_patchset) }

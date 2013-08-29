@@ -1,6 +1,5 @@
 module PGQuilter
   class Worker
-    include Loggable
 
     WORKER_FREQUENCY = 60 * 60 # once an hour
 
@@ -25,9 +24,9 @@ module PGQuilter
       candidates = Topic.active.without_build(for_sha).all
 
       unless candidates.empty?
-        log "Starting builds for #{candidates.count} candidates"
+        puts "Starting builds for #{candidates.count} candidates"
         candidates.each { |topic| check_topic(topic) }
-        log "Completed #{candidates.count} builds"
+        puts "Completed #{candidates.count} builds"
       end
     end
 
@@ -53,7 +52,7 @@ module PGQuilter
       @git.push_to_github(topic)
       @git.ensure_pull_request(topic)
     rescue StandardError => e
-      log "Could not complete build: #{e.message}"
+      puts "Could not complete build: #{e.message}"
       raise
     end
 
