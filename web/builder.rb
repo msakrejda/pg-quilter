@@ -20,6 +20,10 @@ class PGQuilter::Builder < Sinatra::Base
     end
   end
 
+  get '/builds' do
+    PGQuilter::Build.all.map { |b| format_build(b) }
+  end
+
   get '/builds/:uuid' do |uuid|
     b = PGQuilter::Build[uuid]
     if b.nil?
@@ -28,8 +32,25 @@ class PGQuilter::Builder < Sinatra::Base
     format_build(b)
   end
 
-  get '/builds' do
-    PGQuilter::Build.all.map { |b| format_build(b) }
+  get '/builds/:uuid/status' do |uuid|
+    b = PGQuilter::Build[uuid]
+    if b.nil?
+      status 404
+    end
+    {
+      build_id: b.uuid,
+      steps: b.build_steps.order_by(&:started_at).map do |s|
+        {
+          step: s.step,
+          started_at: s.started_at,
+          completed_at: s.completed_at,
+          stdout: s.stdout,
+          stderr: s.stderr,
+          status: s.status,
+          attrs:  s.attrs
+        }
+      end
+    }
   end
 
   private
