@@ -7,15 +7,15 @@ class PGQuilter::Builder < Sinatra::Base
   post '/builds' do
     payload = JSON.parse request.body.read
 
-    base_sha = payload.delete "base_sha"
+    base_rev = payload.delete "base_rev"
     patches = payload.delete "patches"
 
-    if base_sha.nil? || base_sha.empty? ||
+    if base_rev.nil? || base_rev.empty? ||
         patches.nil? || patches.any? { |p| p.class != String } ||
         !payload.empty?
       status 422
     else
-      PGQuilter::TaskMaster.create_build(base_sha, patches)
+      PGQuilter::TaskMaster.create_build(base_rev, patches)
       200
     end
   end
