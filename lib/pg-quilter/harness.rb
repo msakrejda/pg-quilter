@@ -4,10 +4,9 @@ require 'open3'
 module PGQuilter
   class Harness
     class ExecResult
-      attr_reader :cmd, :stdout, :stderr, :status
+      attr_reader :stdout, :stderr, :status
 
-      def initialize(cmd, stdout, stderr, status)
-        @cmd    = cmd
+      def initialize(stdout, stderr, status)
         @stdout = stdout
         @stderr = stderr
         @status = status
@@ -106,7 +105,7 @@ module PGQuilter
         stderrstr = stderr.read
         exitstatus = wthr.value.exitstatus
 
-        ExecResult.new(command, stdoutstr, stderrstr, exitstatus)
+        ExecResult.new(stdoutstr, stderrstr, exitstatus)
       end
     end
 
