@@ -3,6 +3,7 @@ require 'bundler'
 Bundler.setup
 require 'pry'
 require './lib/pg-quilter'
+require 'logger'
 
 include PGQuilter
 
