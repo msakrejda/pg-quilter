@@ -1,9 +1,5 @@
-require 'pp'
-require 'logger'
-
 module PGQuilter
   module TaskMaster
-    include Loggable
     extend self
 
     def create_build(base_sha, patches)
