@@ -12,7 +12,7 @@ EOF
       foreign_key :build_id, :builds, type: :uuid, null: false
       step :name, null: false
       timestamptz :started_at, null: false
-      timestamptz :completed_at, null: false, default: 'now'
+      timestamptz :completed_at, null: false, default: Sequel.function(:now)
       text :stdout, null: false
       text :stderr, null: false
       int :status, null: false

@@ -7,7 +7,7 @@ EOF
 
     create_table :builds do
       uuid :uuid, default: 'uuid_generate_v4()'.lit, primary_key: true
-      timestamptz :created_at, null: false, default: 'now'
+      timestamptz :created_at, null: false, default: Sequel.function(:now)
       text :base_rev, null: false
     end
 
