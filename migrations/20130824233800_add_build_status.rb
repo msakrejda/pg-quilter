@@ -7,7 +7,7 @@ Sequel.migration do
     );
 EOF
 
-    create_table :build_step do
+    create_table :build_steps do
       uuid :uuid, default: 'uuid_generate_v4()'.lit, primary_key: true
       foreign_key :build_id, :builds, type: :uuid, null: false
       step :name, null: false
