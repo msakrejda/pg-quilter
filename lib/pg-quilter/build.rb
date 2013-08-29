@@ -8,6 +8,10 @@ module PGQuilter
 
   class Patch < Sequel::Model
     many_to_one :builds
+
+    def sha1
+      Digest::SHA1.hexdigest(self.body)
+    end
   end
 
   class BuildStep < Sequel::Model

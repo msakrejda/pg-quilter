@@ -25,15 +25,24 @@ class PGQuilter::Builder < Sinatra::Base
     if b.nil?
       status 404
     end
+    format_build(b)
+  end
+
+  get '/builds' do
+    PGQuilter::Build.all.map { |b| format_build(b) }
+  end
+
+  private
+
+  def format_build(b)
     {
       id: uuid,
       created_at: b.created_at,
-      patches: b.patches.sort_by(&:order).map do |p|
-        {
-          sha1: Digest::SHA1.hexdigest(p.body)
-        }
-      end,
-      status: 'pending'
+      patches: b.patches.sort_by(&:order).map { |p| format_patch(p) },
     }.to_json
+  end
+
+  def format_patch(p)
+    { id: p.uuid, sha1: p.sha1 }
   end
 end
