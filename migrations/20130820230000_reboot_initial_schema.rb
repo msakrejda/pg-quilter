@@ -9,7 +9,7 @@ EOF
     create_table :builds do
       uuid :uuid, default: 'uuid_generate_v4()'.lit, primary_key: true
       timestamptz :created_at, null: false, default: 'now'
-      text :base_sha, null: false
+      text :base_rev, null: false
     end
 
     create_table :patches do
