@@ -10,8 +10,8 @@ namespace :db do
     require 'sequel/extensions/migration'
     db_url = ENV['DATABASE_URL'] || 'postgres:///pg-quilter'
     target_version = ENV['VERSION'] if ENV['VERSION']
-    DB = Sequel.connect(db_url, loggers: Logger.new(STDOUT))
-    Sequel::Migrator.apply(DB, 'migrations', target_version)
+    db = Sequel.connect(db_url, loggers: Logger.new(STDOUT))
+    Sequel::Migrator.apply(db, 'migrations', target_version)
   end
 end
 
