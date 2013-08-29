@@ -39,18 +39,8 @@ class PGQuilter::Builder < Sinatra::Base
     end
     {
       build_id: b.uuid,
-      steps: b.build_steps.sort_by(&:started_at).map do |s|
-        {
-          step: s.step,
-          started_at: s.started_at,
-          completed_at: s.completed_at,
-          stdout: s.stdout,
-          stderr: s.stderr,
-          status: s.status,
-          attrs:  s.attrs
-        }
-      end
-    }
+      steps: b.build_steps.sort_by(&:started_at).map { |s| format_step(s) }
+    }.to_json
   end
 
   private
@@ -65,5 +55,20 @@ class PGQuilter::Builder < Sinatra::Base
 
   def format_patch(p)
     { id: p.uuid, sha1: p.sha1 }
+  end
+
+  def format_step(s)
+    result = {
+      step: s.name,
+      started_at: s.started_at,
+      completed_at: s.completed_at,
+      stdout: s.stdout,
+      stderr: s.stderr,
+      status: s.status
+    }
+    unless s.attrs.nil?
+      result[:attrs] = s.attrs.to_hash
+    end
+    result
   end
 end
