@@ -68,6 +68,10 @@ module PGQuilter
       run %W(fakesu -c /app/bin/pg-make #{workdir})
     end
 
+    def make_contrib
+      run %W(fakesu -c /app/bin/pg-make-contrib #{workdir})
+    end
+
     def make_check
       in_dir workdir do
         run %W(make check)
