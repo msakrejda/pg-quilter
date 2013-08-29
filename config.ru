@@ -6,4 +6,4 @@ use Rack::CommonLogger
 
 require './web/builder'
 
-map("/") { run PGQuilter::Builder }
+map("/v1") { run PGQuilter::Builder }
