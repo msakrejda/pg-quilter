@@ -7,4 +7,4 @@ cd "$workdir"
 #TODO: add --with-gssapi
 ./configure --with-libxml --with-openssl --enable-cassert \
             --enable-nls --with-tcl --with-perl --with-python \
-            --with-pam --with-ldap --with-libxslt
+            --with-pam --with-ldap --with-libxslt --with-gssapi

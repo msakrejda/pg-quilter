@@ -9,6 +9,6 @@ rm -rf "$workspace"
 mkdir -p "$workspace"
 
 fakesu -c 'apt-get update'
-fakesu -c 'apt-get install --yes build-essential flex bison libreadline-dev zlib1g-dev libssl-dev libxml2-dev python-dev libgss-dev libpam0g-dev libxslt1-dev libldap2-dev gettext tcl-dev libperl-dev'
+fakesu -c 'apt-get install --yes build-essential flex bison libreadline-dev zlib1g-dev libssl-dev libxml2-dev python-dev libgss-dev libpam0g-dev libxslt1-dev libldap2-dev gettext tcl-dev libperl-dev libkrb5-dev'
 
 git clone "$repo_url" "$workspace"
