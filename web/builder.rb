@@ -39,7 +39,7 @@ class PGQuilter::Builder < Sinatra::Base
     end
     {
       build_id: b.uuid,
-      steps: b.build_steps.order_by(&:started_at).map do |s|
+      steps: b.build_steps.sort_by(&:started_at).map do |s|
         {
           step: s.step,
           started_at: s.started_at,
