@@ -46,7 +46,7 @@ module PGQuilter
     def step(name)
       start_time = Time.now
       result, attrs = yield
-      build.add_build_step(step:   name,
+      build.add_build_step(name:   name,
                            started_at: start_time,
                            stdout: result.stdout,
                            stderr: result.stderr,
