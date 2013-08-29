@@ -1,6 +1,4 @@
 ENV['DATABASE_URL'] = 'postgres:///pg-quilter'
-ENV['LOG_LEVEL'] = 'WARN'
-ENV['QUILTER_EMAIL'] = 'pg-quilter@example.com'
 
 require './lib/pg-quilter'
 require 'rspec'
