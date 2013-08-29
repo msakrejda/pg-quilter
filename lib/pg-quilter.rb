@@ -1,11 +1,13 @@
 require 'json'
 require 'sequel'
+require 'sequel/extensions/pg_hstore'
 require 'sinatra'
 require 'sinatra/base'
 
 $:.unshift File.dirname(__FILE__)
 
 DB = Sequel.connect(ENV['DATABASE_URL'])
+DB.extension :pg_hstore
 
 require 'pg-quilter/config'
 require 'pg-quilter/harness'

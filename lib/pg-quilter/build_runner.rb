@@ -46,6 +46,9 @@ module PGQuilter
     def step(name)
       start_time = Time.now
       result, attrs = yield
+      unless attrs.nil?
+        attrs = Sequel.hstore(attrs)
+      end
       build.add_build_step(name:   name,
                            started_at: start_time,
                            stdout: result.stdout,
