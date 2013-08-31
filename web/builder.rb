@@ -15,8 +15,8 @@ class PGQuilter::Builder < Sinatra::Base
         !payload.empty?
       status 422
     else
-      PGQuilter::TaskMaster.create_build(base_rev, patches)
-      200
+      build = PGQuilter::TaskMaster.create_build(base_rev, patches)
+      { id: build.uuid }.to_json
     end
   end
 

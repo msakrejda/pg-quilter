@@ -9,6 +9,7 @@ module PGQuilter
       patches.each_with_index do |patch, index|
         build.add_patch(order: index, body: patch)
       end
+      build
     end
   end
 end
