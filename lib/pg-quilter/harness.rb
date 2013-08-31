@@ -32,7 +32,7 @@ module PGQuilter
 
     # Prepare a workspace: install dependencies and set up the local git clone
     def prepare_workspace
-      run %W(bin/pg-prepare-workspace #{workdir} #{::PGQuilter::Config::WORK_REPO_URL})
+      run %W(bin/pg-prepare-workspace #{workdir} #{::PGQuilter::Config::UPSTREAM_REPO_URL})
     end
 
     # Clean the workspace, update upstream and reset master branch to given rev
@@ -45,7 +45,7 @@ module PGQuilter
         base_rev = "origin/#{base_rev}"
       end
       in_dir workdir do
-        run %W(/app/bin/pg-reset-workspace #{workdir} #{base_rev})
+        run %W(#{pwd}/bin/pg-reset-workspace #{workdir} #{base_rev})
       end
     end
 
@@ -53,22 +53,22 @@ module PGQuilter
       Tempfile.open('pg-quilter-postgres', '/tmp') do |f|
         f.write patch_body
         f.flush
-        in_workdir do
+        in_dir workdir do
           run %W(git apply --summary --stat --apply --verbose #{f.path})
         end
       end
     end
 
     def configure
-      run %W(fakesu -c /app/bin/pg-configure #{workdir})
+      run %W(fakesu -c #{pwd}/bin/pg-configure #{workdir})
     end
 
     def make
-      run %W(fakesu -c /app/bin/pg-make #{workdir})
+      run %W(fakesu -c #{pwd}/bin/pg-make #{workdir})
     end
 
     def make_contrib
-      run %W(fakesu -c /app/bin/pg-make-contrib #{workdir})
+      run %W(fakesu -c #{pwd}/bin/pg-make-contrib #{workdir})
     end
 
     def make_check
@@ -93,6 +93,10 @@ module PGQuilter
 
     def workdir
       ::PGQuilter::Config::WORK_DIR
+    end
+
+    def pwd
+      ENV['PWD']
     end
 
     def run(command)
