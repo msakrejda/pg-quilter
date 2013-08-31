@@ -17,11 +17,8 @@ end
 
 namespace :worker do
   task :run do
-    github = Github.new(login: PGQuilter::Config::GITHUB_USER,
-                        password: PGQuilter::Config::GITHUB_PASSWORD)
-    harness = PGQuilter::GitHarness.new
-    git = PGQuilter::Git.new(harness, github)
-    worker = PGQuilter::Worker.new(git)
+    harness = PGQuilter::Harness.new
+    worker = PGQuilter::Worker.new(harness)
     worker.run
   end
 end
