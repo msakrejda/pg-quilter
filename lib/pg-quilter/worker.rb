@@ -8,9 +8,12 @@ module PGQuilter
     # Run given build
     def run_build(build)
       runner = BuildRunner.new(build, @harness)
+      puts "Starting build #{build.uuid}"
       runner.run
     rescue StandardError => e
-      puts "Could not complete build: #{e.message}"
+      puts "Could not complete build #{build.uuid}: #{e.message}"
+    ensure
+      puts "Build #{build.uuid} finished"
     end
 
     # Run unbuilt builds
