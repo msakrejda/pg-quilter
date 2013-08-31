@@ -22,3 +22,27 @@ namespace :worker do
     worker.run
   end
 end
+
+namespace :generate do
+  task :migration, :name do |t, args|
+    name = args[:name]
+    if name.nil?
+      raise ArgumentError, "Expected migration name"
+    end
+    filename = "./migrations/#{Time.now.strftime "%Y%m%d%H%M%S"}_#{name}.rb"
+    File.open(filename, 'w') do |file|
+      file << <<-FILE
+Sequel.migration do
+  up do
+
+  end
+
+  down do
+
+  end
+end
+FILE
+    end
+    puts "Added #{filename}"
+  end
+end
