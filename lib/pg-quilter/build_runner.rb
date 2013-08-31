@@ -43,6 +43,8 @@ module PGQuilter
       puts e.message
     end
 
+    private
+
     def step(name)
       start_time = Time.now
       result, attrs = yield
