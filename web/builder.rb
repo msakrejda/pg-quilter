@@ -1,6 +1,6 @@
 require 'sinatra'
 require 'json'
-require 'mail'
+require 'time'
 
 class PGQuilter::Builder < Sinatra::Base
   # validate and store a build request; to be picked up by a worker
@@ -45,7 +45,7 @@ class PGQuilter::Builder < Sinatra::Base
   def format_build(b)
     {
       id: b.uuid,
-      created_at: b.created_at,
+      created_at: format_time(b.created_at),
       state: b.state,
       patches: b.patches.sort_by(&:order).map { |p| format_patch(p) },
     }.to_json
@@ -58,8 +58,8 @@ class PGQuilter::Builder < Sinatra::Base
   def format_step(s)
     result = {
       step: s.name,
-      started_at: s.started_at,
-      completed_at: s.completed_at,
+      started_at: format_time(s.started_at),
+      completed_at: format_time(s.completed_at),
       stdout: s.stdout,
       stderr: s.stderr,
       status: s.status
@@ -68,5 +68,11 @@ class PGQuilter::Builder < Sinatra::Base
       result[:attrs] = s.attrs.to_hash
     end
     result
+  end
+
+  def format_time(t)
+    unless t.nil?
+      t.to_datetime.rfc3339
+    end
   end
 end
