@@ -21,7 +21,7 @@ class PGQuilter::Builder < Sinatra::Base
   end
 
   get '/builds' do
-    PGQuilter::Build.all.map { |b| format_build(b) }
+    PGQuilter::Build.all.map { |b| format_build(b) }.to_json
   end
 
   get '/builds/:uuid' do |uuid|
@@ -29,7 +29,7 @@ class PGQuilter::Builder < Sinatra::Base
     if b.nil?
       status 404
     end
-    format_build(b)
+    format_build(b).to_json
   end
 
   get '/builds/:uuid/steps' do |uuid|
@@ -48,7 +48,7 @@ class PGQuilter::Builder < Sinatra::Base
       created_at: format_time(b.created_at),
       state: b.state,
       patches: b.patches.sort_by(&:order).map { |p| format_patch(p) },
-    }.to_json
+    }
   end
 
   def format_patch(p)
