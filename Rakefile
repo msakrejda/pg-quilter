@@ -24,6 +24,11 @@ namespace :worker do
 end
 
 namespace :generate do
+  task :token do
+    token = PGQuilter::ApiToken.generate
+    puts token.secret
+  end
+
   task :migration, :name do |t, args|
     name = args[:name]
     if name.nil?

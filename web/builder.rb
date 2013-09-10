@@ -3,6 +3,22 @@ require 'json'
 require 'time'
 
 class PGQuilter::Builder < Sinatra::Base
+
+  before do
+    unless request.request_method == 'OPTIONS'
+      authenticate
+    end
+  end
+
+  def authenticate
+    auth = Rack::Auth::Basic::Request.new(request.env)
+    throw(:halt, [401, "Not Authorized\n"]) unless auth.provided? && auth.basic? && auth.credentials
+    token = auth.credentials.last
+    unless PGQuilter::ApiToken.valid? token
+      throw(:halt, [401, "Not authorized\n"])
+    end
+  end
+
   # validate and store a build request; to be picked up by a worker
   post '/builds' do
     payload = JSON.parse request.body.read
