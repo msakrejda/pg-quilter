@@ -5,9 +5,11 @@ class PGQuilter::Auth < Sinatra::Base
 
   %w(get post).each do |method|
     send(method, "/auth/:provider/callback") do |provider|
-      auth_result = env['omniauth.auth']
+      auth = env['omniauth.auth']
       puts "auth success:"
-      puts auth_result
+      puts auth.provider
+      puts auth.uid
+      puts auth.info.name
     end
   end
 
