@@ -7,10 +7,10 @@ gem 'sequel'
 
 gem 'sinatra'
 gem 'thin'
-gem 'mail'
 gem 'pry'
-gem 'github_api'
 gem 'rake'
+
+gem 'omniauth-github', :git => 'git://github.com/intridea/omniauth-github.git'
 
 group :test do
   gem "rspec"
