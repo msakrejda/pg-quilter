@@ -8,6 +8,13 @@ class PGQuilter::Builder < Sinatra::Base
     unless request.request_method == 'OPTIONS'
       authenticate
     end
+    cors_headers
+  end
+
+  def cors_headers
+    headers 'Access-Control-Allow-Origin' => '*',
+    'Access-Control-Allow-Headers' => 'Authorization, X-Requested-With, Content-Type',
+    'Access-Control-Allow-Methods' => 'GET, POST, PUT, DELETE'
   end
 
   def authenticate
