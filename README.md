@@ -1,3 +1,6 @@
+Now that [cfbot](http://cfbot.cputube.org/) exists and includes most
+of this functionality, pg-quilter is obsolete.
+
 # pg-quilter
 
 `pg-quilter` is a continuous integration tool to help streamline the
